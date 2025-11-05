@@ -85,7 +85,8 @@ public class EmployeeController {
      */
 	@PostMapping("/payslip/generate")
     public ResponseEntity<PayslipDto> generate(@RequestBody GeneratePayslipRequest request) throws Exception {
-        Payslip p = employeeService.generatePayslip(request.getEmployeeId(), request.getMonthYear());
+        System.out.println(request);
+		Payslip p = employeeService.generatePayslip(request.getEmployeeId(), request.getMonthYear());
         PayslipDto dto = PayslipDto.fromEntity(p);
         return ResponseEntity.ok(dto);
     }

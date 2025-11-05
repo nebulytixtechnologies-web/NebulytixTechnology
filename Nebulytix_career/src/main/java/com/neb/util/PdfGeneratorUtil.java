@@ -62,7 +62,7 @@ public class PdfGeneratorUtil {
         try {
         	//  C:/path/to/NebulytixLogo.jpg
            // String logoPath = "E:/NEBULYTIX TECHNOLOGIES/files/nebTechLogo.jpg"; // ✅ update this to your logo file path
-            String logoPath = "C:\\Users\\USER\\git\\AdminHr-EmpDashboards\\AdminHrEmpDashBoards\\src\\main\\webapp\\images\\NebulytixLogo.jpg"; // ✅ update this to your logo file path
+            String logoPath ="E:/NEBULYTIX TECHNOLOGIES/files/nebTechLogo.jpg";//C:\\Users\\USER\\git\\AdminHr-EmpDashboards\\AdminHrEmpDashBoards\\src\\main\\webapp\\images\\NebulytixLogo.jpg"
             File file = new File(logoPath);
             if (file.exists()) {
                 Image logo = Image.getInstance(logoPath);

@@ -50,6 +50,8 @@ public class PayslipScheduler {
                 .getMonth()
                 .getDisplayName(TextStyle.FULL, Locale.ENGLISH)
                 + " " + LocalDate.now().getYear();
+        
+        System.out.println(">>>>>>>>>>monthYear:"+monthYear);
 
         for (Employee emp : employees) {
             try {
