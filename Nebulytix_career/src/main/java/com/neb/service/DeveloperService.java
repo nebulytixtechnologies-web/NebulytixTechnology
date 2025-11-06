@@ -116,10 +116,22 @@ public class DeveloperService {
         verificationManager.clear(email);
 
         // Send confirmation email
-        emailService.sendApplicationMail(email,
-                "Application Received - " + app.getRole(),
-                "Hello " + app.getFirstName() + ",\n\nYour developer application has been successfully submitted.\n\nHR Team");
+        
+           String subject = "Application Submitted Successfully";
+        String text = "Hello " + app.getFirstName() + ",\n\n" +
+                "Thank you very much for applying for the "+ app.getRole()+ "position. At NEBULYTIX TECHNOLOGY, we are undergoing an unprecedented transformation,\r\n"
+                + "          and we are delighted that you are interested in being part of this journey.\r\n"
+                + "           Currently, our recruitment team is reviewing all applications. \r\n"
+                + "           We will contact you via email regarding the next steps as soon as the selection results are determined.";
+        
+        emailService.sendApplicationMail(email, subject, text);
+         
+        
+//        emailService.sendApplicationMail(email,
+//                "Application Received - " + app.getRole(),
+//                "Hello " + app.getFirstName() + ",\n\nYour developer application has been successfully submitted.\n\nHR Team");
         // checking of role
+    /* 
         if(app.getRole().equalsIgnoreCase("developer"))
         {
            //checking the domain for developer
@@ -193,6 +205,9 @@ public class DeveloperService {
     		
     	 }// end of switch case for domain
         }// end of if condition
+        
+        */
+        
         response.put("status", "success");
         response.put("message", "Application submitted successfully! check your mail for the assessment");
         return ResponseEntity.ok(response);

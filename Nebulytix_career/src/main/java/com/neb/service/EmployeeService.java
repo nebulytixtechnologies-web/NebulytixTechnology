@@ -70,7 +70,7 @@ public interface EmployeeService {
     public List<Work> getTasksByEmployee(Long employeeId);
 
     // Submit task report after completion
-    public Work submitReport(Long taskId, String reportDetails, LocalDate submittedDate);
+    public Work submitReport(Long taskId, SubmitTaskReportDto report, LocalDate submittedDate);
 
     // Get employee details by email
     public EmployeeDetailsResponseDto getEmployeeByEmail(String email);

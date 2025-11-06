@@ -22,6 +22,7 @@ import com.neb.dto.GeneratePayslipRequest;
 import com.neb.dto.LoginRequestDto;
 import com.neb.dto.PayslipDto;
 import com.neb.dto.ResponseMessage;
+import com.neb.dto.SubmitTaskReportDto;
 import com.neb.entity.Employee;
 import com.neb.entity.Payslip;
 import com.neb.entity.Work;
@@ -146,10 +147,12 @@ public class EmployeeController {
     @PutMapping("/task/submit/{taskId}")
     public ResponseMessage<Work> submitTaskReport(
             @PathVariable Long taskId,
-            @RequestBody Work reportData
+            @RequestBody SubmitTaskReportDto report
     ) {
-        Work updatedTask = employeeService.submitReport(taskId, reportData.getReportDetails(),  LocalDate.now());
+    	
+        Work updatedTask = employeeService.submitReport(taskId, report,  LocalDate.now());
         return new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Report submitted successfully", updatedTask);
+ 
     }
     
 

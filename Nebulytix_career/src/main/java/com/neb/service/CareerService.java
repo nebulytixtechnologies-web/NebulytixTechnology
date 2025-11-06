@@ -163,11 +163,17 @@ public class CareerService {
         verificationService.removeCode(email);
 
         // Send confirmation + assessment emails
-        String subject = "NEBULYTIX | Java Intern Assessment";
+        String subject = "Application Submitted Successfully";
         String text = "Hello " + app.getFirstName() + ",\n\n" +
-                "Your application has been successfully submitted.\n\nBest regards,\nHR Team";
+                "Thank you very much for applying for the intern position. At NEBULYTIX TECHNOLOGY, we are undergoing an unprecedented transformation,\r\n"
+                + "          and we are delighted that you are interested in being part of this journey.\r\n"
+                + "           Currently, our recruitment team is reviewing all applications. \r\n"
+                + "           We will contact you via email regarding the next steps as soon as the selection results are determined.";
+        
         emailService.sendApplicationMail(email, subject, text);
         
+        //currently test link is not working 
+        /*
        // If role is intern, send domain-specific assessment email
          if(app.getRole().equalsIgnoreCase("intern"))
         {
@@ -240,9 +246,11 @@ public class CareerService {
         	
         	
         }// end of if condition
+        
+        */
  
          response.put("status", "success");
-         response.put("message", "Your Application Submitted Successfully. Check your email to start the assessment.");
+         response.put("message", "Your Application Submitted Successfully");
          return ResponseEntity.ok(response);
     }
 }

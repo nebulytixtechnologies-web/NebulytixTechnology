@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.neb.dto.EmployeeDetailsResponseDto;
 import com.neb.dto.EmployeeResponseDto;
 import com.neb.dto.LoginRequestDto;
+import com.neb.dto.SubmitTaskReportDto;
 import com.neb.entity.Employee;
 import com.neb.entity.Payslip;
 import com.neb.entity.Work;
@@ -221,11 +222,11 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return updated Work entity with completion details
      * @throws CustomeException if task is not found
      */
-    public Work submitReport(Long taskId, String reportDetails, LocalDate submittedDate) {
+    public Work submitReport(Long taskId, SubmitTaskReportDto report, LocalDate submittedDate) {
         Work task = workRepository.findById(taskId).orElseThrow(() -> new CustomeException("Task not found with taskId :"+taskId));
-        task.setReportDetails(reportDetails);
+        task.setReportDetails(report.getReportDetails());
         task.setSubmittedDate(submittedDate);
-        task.setStatus(com.neb.constants.WorkStatus.COMPLETED);
+        task.setStatus(report.getStatus());
         return workRepository.save(task);
     }
 	 

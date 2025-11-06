@@ -125,11 +125,22 @@ public class CloudDeveloperService {
         cloudDeveloperVerificationManager.clear(email);
 
         // Send confirmation email
-        emailService.sendApplicationMail(email,
-                "Application Received - " + app.getRole(),
-                "Hello " + app.getFirstName() + ",\n\nYour cloud developer application has been successfully submitted.\n\nHR Team");
-      
+        
+          String subject = "Application Submitted Successfully";
+        String text = "Hello " + app.getFirstName() + ",\n\n" +
+                "Thank you very much for applying for the Cloud Engineer position. At NEBULYTIX TECHNOLOGY, we are undergoing an unprecedented transformation,\r\n"
+                + "          and we are delighted that you are interested in being part of this journey.\r\n"
+                + "           Currently, our recruitment team is reviewing all applications. \r\n"
+                + "           We will contact you via email regarding the next steps as soon as the selection results are determined.";
+        
+        emailService.sendApplicationMail(email, subject, text);
+         
+//        emailService.sendApplicationMail(email,
+//                "Application Received - " + app.getRole(),
+//                "Hello " + app.getFirstName() + ",\n\nYour cloud developer application has been successfully submitted.\n\nHR Team");
+//      
         // Send domain-specific assessment email
+        /*
         System.out.println(" ===>"+app.getDomain());
         String assessmentSubject = "NEBULYTIX | Assessment for " + app.getRole() + " Position";
 
@@ -150,8 +161,8 @@ public class CloudDeveloperService {
                 "Nebulytix Technologies";
 
         emailService.sendApplicationMail(app.getEmail(), assessmentSubject, assessmentText);
-
-
+        
+        */
 
         response.put("status", "success");
         response.put("message", "Application submitted successfully!");
