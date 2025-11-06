@@ -43,4 +43,15 @@ public class GlobalExceptionHandler {
         CareerApplicationResponseDto resp = new CareerApplicationResponseDto(null, "error", "Internal server error");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resp);
     }
+    
+    
+    /**
+     * Handles exceptions that occur during payslip generation.
+     */
+    @ExceptionHandler(PayslipGenerationException.class)
+    public ResponseEntity<CareerApplicationResponseDto> handlePayslipGenerationException(PayslipGenerationException ex) {
+        CareerApplicationResponseDto resp = new CareerApplicationResponseDto(null, "error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resp);
+    }
+
 }

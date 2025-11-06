@@ -1,11 +1,13 @@
 package com.neb.scheduler;
 
 import com.neb.entity.Employee;
+import com.neb.exception.PayslipGenerationException; // ✅ Added import for custom exception
 import com.neb.repo.EmployeeRepository;
 import com.neb.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
@@ -50,16 +52,24 @@ public class PayslipScheduler {
                 .getMonth()
                 .getDisplayName(TextStyle.FULL, Locale.ENGLISH)
                 + " " + LocalDate.now().getYear();
-        
-        System.out.println(">>>>>>>>>>monthYear:"+monthYear);
 
+        System.out.println(">>>>>>>>>>monthYear: " + monthYear);
+
+        // ✅ Loop through each employee and generate payslip
         for (Employee emp : employees) {
+
+            // ✅ Updated exception handling (Old block replaced here)
             try {
                 employeeService.generatePayslip(emp.getId(), monthYear);
                 System.out.println("✅ Payslip generated for: " + emp.getFirstName() + " (" + monthYear + ")");
             } catch (Exception e) {
-                System.err.println("❌ Error generating payslip for employee ID " + emp.getId());
-                e.printStackTrace();
+                // ❌ Old Code (Removed):
+                // System.err.println("❌ Error generating payslip for employee ID " + emp.getId());
+                // e.printStackTrace();
+
+                // ✅ New Code: Throw custom exception so GlobalExceptionHandler can handle it
+                throw new PayslipGenerationException(
+                        "Failed to generate payslip for employee ID: " + emp.getId(), e);
             }
         }
 
