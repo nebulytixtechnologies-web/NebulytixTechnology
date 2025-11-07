@@ -16,6 +16,8 @@ import com.neb.dto.EmployeeDetailsResponseDto;
 import com.neb.dto.EmployeeResponseDto;
 import com.neb.dto.LoginRequestDto;
 import com.neb.dto.PayslipDto;
+import com.neb.dto.UpdateBankDetailsRequestDto;
+import com.neb.dto.UpdatePasswordRequestDto;
 import com.neb.entity.Employee;
 import com.neb.entity.Payslip;
 import com.neb.exception.CustomeException;
@@ -269,5 +271,49 @@ public class HrServiceImpl implements HrService{
         Employee updatedEmp = empRepo.save(emp);
         return mapper.map(updatedEmp, EmployeeDetailsResponseDto.class);
     }
+    
+    @Override
+    public EmployeeDetailsResponseDto updatePassword(Long id, UpdatePasswordRequestDto updatePasswordRequestDto) {
+        // ✅ Find employee by ID
+        Employee emp = empRepo.findById(id)
+                .orElseThrow(() -> new CustomeException("Employee not found with id: " + id));
+
+        // ✅ Update password
+        emp.setPassword(updatePasswordRequestDto.getPassword());
+
+        // ✅ Save updated employee
+        Employee updatedEmp = empRepo.save(emp);
+
+        // ✅ Return updated DTO
+        return mapper.map(updatedEmp, EmployeeDetailsResponseDto.class);
+    }
+
+    @Override
+    public EmployeeDetailsResponseDto updateBankDetails(Long id, UpdateBankDetailsRequestDto bankDetailsDto) {
+        Employee emp = empRepo.findById(id)
+                .orElseThrow(() -> new CustomeException("Employee not found with id: " + id));
+
+        // Update only bank-related fields
+        if (bankDetailsDto.getBankAccountNumber() != null && !bankDetailsDto.getBankAccountNumber().isEmpty())
+            emp.setBankAccountNumber(bankDetailsDto.getBankAccountNumber());
+        if (bankDetailsDto.getBankName() != null && !bankDetailsDto.getBankName().isEmpty())
+            emp.setBankName(bankDetailsDto.getBankName());
+        if (bankDetailsDto.getPfNumber() != null && !bankDetailsDto.getPfNumber().isEmpty())
+            emp.setPfNumber(bankDetailsDto.getPfNumber());
+        if (bankDetailsDto.getPanNumber() != null && !bankDetailsDto.getPanNumber().isEmpty())
+            emp.setPanNumber(bankDetailsDto.getPanNumber());
+        if (bankDetailsDto.getUanNumber() != null && !bankDetailsDto.getUanNumber().isEmpty())
+            emp.setUanNumber(bankDetailsDto.getUanNumber());
+        if (bankDetailsDto.getEpsNumber() != null && !bankDetailsDto.getEpsNumber().isEmpty())
+            emp.setEpsNumber(bankDetailsDto.getEpsNumber());
+        if (bankDetailsDto.getEsiNumber() != null && !bankDetailsDto.getEsiNumber().isEmpty())
+            emp.setEsiNumber(bankDetailsDto.getEsiNumber());
+
+        Employee updatedEmp = empRepo.save(emp);
+
+        // Return all details (not just bank info)
+        return mapper.map(updatedEmp, EmployeeDetailsResponseDto.class);
+    }
+
 
 }

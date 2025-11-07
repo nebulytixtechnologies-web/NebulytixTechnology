@@ -25,6 +25,8 @@ import com.neb.dto.GeneratePayslipRequest;
 import com.neb.dto.LoginRequestDto;
 import com.neb.dto.PayslipDto;
 import com.neb.dto.ResponseMessage;
+import com.neb.dto.UpdateBankDetailsRequestDto;
+import com.neb.dto.UpdatePasswordRequestDto;
 import com.neb.entity.Payslip;
 import com.neb.service.EmployeeService;
 import com.neb.service.HrService;
@@ -211,7 +213,40 @@ public class HrController {
                 "Employee details updated successfully",
                 updatedEmp));
     }
-    
+    @PutMapping("/updatePassword/{id}")
+    public ResponseEntity<ResponseMessage<EmployeeDetailsResponseDto>> updatePassword(
+            @PathVariable Long id,
+            @RequestBody UpdatePasswordRequestDto updatePasswordRequestDto) {
+
+        EmployeeDetailsResponseDto updatedEmp = service.updatePassword(id, updatePasswordRequestDto);
+
+        return ResponseEntity.ok(
+                new ResponseMessage<>(
+                        HttpStatus.OK.value(),
+                        HttpStatus.OK.name(),
+                        "Password updated successfully",
+                        updatedEmp
+                )
+        );
+    }
+    @PutMapping("/updateBankDetails/{id}")
+    public ResponseEntity<ResponseMessage<EmployeeDetailsResponseDto>> updateBankDetails(
+            @PathVariable Long id,
+            @RequestBody UpdateBankDetailsRequestDto bankDetailsDto) {
+
+        EmployeeDetailsResponseDto updatedEmp = service.updateBankDetails(id, bankDetailsDto);
+
+        return ResponseEntity.ok(
+                new ResponseMessage<>(
+                        HttpStatus.OK.value(),
+                        HttpStatus.OK.name(),
+                        "Bank details updated successfully",
+                        updatedEmp
+                )
+        );
+    }
+
+
   
   
 }

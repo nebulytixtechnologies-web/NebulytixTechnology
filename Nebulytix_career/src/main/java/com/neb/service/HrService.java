@@ -89,4 +89,9 @@ public interface HrService {
 
     // Update existing employee information
     EmployeeDetailsResponseDto updateEmployee(Long id, AddEmployeeRequestDto updateReq);
+    
+    EmployeeDetailsResponseDto updatePassword(Long id, UpdatePasswordRequestDto updatePasswordRequestDto);
+    EmployeeDetailsResponseDto updateBankDetails(Long id, UpdateBankDetailsRequestDto bankDetailsDto);
+
+
 }
