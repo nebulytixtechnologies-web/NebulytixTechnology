@@ -1,6 +1,6 @@
 package com.neb.controller;
 
-//Original Admin
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.neb.dto.AddEmployeeRequestDto;
 import com.neb.dto.AddEmployeeResponseDto;
@@ -102,34 +104,23 @@ public class AdminController {
 		
 		return ResponseEntity.ok(new ResponseMessage<List<EmployeeDetailsResponseDto>>(HttpStatus.OK.value(), HttpStatus.OK.name(), "All Employee fetched successfully", employeeList));
 	}
-	
-	/**
-     * Adds new work or task details for employees.
-     * 
-     * @param dto Contains details about the work to be assigned.
-     * @return Response confirming successful work addition.
-     */
-	 @PostMapping("/work/add")
-    public ResponseEntity<ResponseMessage<WorkResponseDto>> addWork(@RequestBody AddWorkRequestDto dto) {
-        
-        WorkResponseDto workRes = adminService.assignWork(dto);
-
-        return ResponseEntity.ok(
-            new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Work added successfully", workRes)
-        );
-    }
-	 
 	     /**
 	     * Assigns work to an employee.
 	     * 
 	     * @param req Work assignment request containing employee ID and task details.
 	     * @return Response confirming work assignment success.
 	     */
-	  // ✅ Assign Work
-	    @PostMapping("/assignWork")
-	    public ResponseEntity<ResponseMessage<WorkResponseDto>> assignWork(@RequestBody AddWorkRequestDto req) {
-	        WorkResponseDto work = adminService.assignWork(req);
-	        return ResponseEntity.ok(new ResponseMessage<>(200, "OK", "Work assigned successfully", work));
+	 @PostMapping(value = "/work/add", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+	    public ResponseEntity<ResponseMessage<String>> addWork(
+	        @RequestPart("dto") AddWorkRequestDto dto,
+	        @RequestPart(value = "file", required = false) MultipartFile file
+	    ) throws IOException {
+
+	        String workRes = adminService.assignWork(dto, file);
+
+	        return ResponseEntity.ok(
+	            new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Work added successfully", workRes)
+	        );
 	    }
         
 	    /**
@@ -137,10 +128,10 @@ public class AdminController {
 	     * 
 	     * @return Response containing a list of all work entries.
 	     */
-	    // ✅ Get all Work
-	    @GetMapping("/getAllWork")
-	    public ResponseEntity<ResponseMessage<List<WorkResponseDto>>> getAllWork() {
-	        List<WorkResponseDto> works = adminService.getAllWorks();
+	    // ✅ Get all Work of employee
+	    @GetMapping("/getAllWork/{empId}")
+	    public ResponseEntity<ResponseMessage<List<WorkResponseDto>>> getAllWork(@PathVariable Long empId) {
+	        List<WorkResponseDto> works = adminService.getAllWorks(empId);
 	        return ResponseEntity.ok(new ResponseMessage<>(200, "OK", "All work fetched successfully", works));
 	    }
 	    

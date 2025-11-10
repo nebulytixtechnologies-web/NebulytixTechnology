@@ -1,5 +1,10 @@
 package com.neb.service.impl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 //original 
 import java.util.List;
@@ -8,8 +13,12 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+//import com.itextpdf.text.pdf.StringUtils;
 import com.neb.constants.WorkStatus;
 import com.neb.dto.AddEmployeeRequestDto;
 import com.neb.dto.AddEmployeeResponseDto;
@@ -65,6 +74,9 @@ public class AdminServiceImpl implements AdminService{
     @Autowired
     private ModelMapper mapper;
     
+    @Value("${task.attachment}")
+    private String uploadDir;
+    
     /**
      * Validates login credentials for Admin, HR, or Employee.
      * 
@@ -108,6 +120,7 @@ public class AdminServiceImpl implements AdminService{
 
         // map DTO to entity
         Employee emp = mapper.map(addEmpReq, Employee.class);
+        emp.setLoginRole("hr");
 
         // save entity
         Employee savedEmp = empRepo.save(emp);
@@ -154,7 +167,7 @@ public class AdminServiceImpl implements AdminService{
      * @throws CustomeException if the employee ID is invalid
      */
 	
-    public WorkResponseDto assignWork(AddWorkRequestDto request) {
+    public String assignWork(AddWorkRequestDto request,MultipartFile file) {
         Employee emp = empRepo.findById(request.getEmployeeId())
                 .orElseThrow(() -> new CustomeException("Employee not found with id :"+request.getEmployeeId()));
 
@@ -165,11 +178,40 @@ public class AdminServiceImpl implements AdminService{
         work.setDueDate(request.getDueDate());
         work.setStatus(WorkStatus.ASSIGNED);
         work.setEmployee(emp);
+        
+        if (file != null && !file.isEmpty()) {
+            // validate PDF
+            if (!"application/pdf".equals(file.getContentType())) {
+                throw new CustomeException("Only PDF attachment allowed");
+            }
+            
+            try {
+            	
+            	// ensure directory exists
+                Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+                Files.createDirectories(uploadPath);
 
-        Work savedWork= workRepo.save(work);
-        WorkResponseDto workRes = mapToDto(savedWork);
+                String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
+                // optionally add unique suffix
+                String fileName = System.currentTimeMillis() + "_" + originalFilename;
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        return workRes;
+                // set URL or path in work
+                work.setAttachmentUrl("/uploads/tasks/" + fileName);
+
+            }catch (IOException ex) {
+                throw new CustomeException("Could not store file. Error: " + ex.getMessage());
+            }
+        }
+        
+        Work savedWork = workRepo.save(work);
+        
+        if(savedWork!=null) {
+        	return "Task Assigned Successfully";
+        }
+        else
+        return "failed to assign task";
     }
 
     /**
@@ -178,8 +220,8 @@ public class AdminServiceImpl implements AdminService{
      * @return list of WorkResponseDto
      * @throws CustomeException if no works are found
      */ 
-    public List<WorkResponseDto> getAllWorks() {
-    	List<Work> allWork = workRepo.findAll();
+    public List<WorkResponseDto> getAllWorks(Long empId) {
+    	List<Work> allWork = workRepo.findByEmployeeId(empId);
     	if(allWork==null) {
     		throw new CustomeException("works not found");
     	}
@@ -230,6 +272,8 @@ public class AdminServiceImpl implements AdminService{
         dto.setEmployeeId(work.getEmployee().getId());
         dto.setEmployeeName(work.getEmployee().getFirstName() + " " + work.getEmployee().getLastName());
         dto.setEmployeeEmail(work.getEmployee().getEmail());
+        dto.setAttachmentUrl(work.getAttachmentUrl());
+        dto.setReportAttachmentUrl(work.getReportAttachmentUrl());
         return dto;
     }
 

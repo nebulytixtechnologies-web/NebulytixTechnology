@@ -1,7 +1,10 @@
 package com.neb.service.impl;
+import java.io.IOException;
 //original
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,11 +13,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.neb.constants.WorkStatus;
 import com.neb.dto.EmployeeDetailsResponseDto;
 import com.neb.dto.EmployeeResponseDto;
 import com.neb.dto.LoginRequestDto;
 import com.neb.dto.SubmitTaskReportDto;
+import com.neb.dto.WorkResponseDto;
 import com.neb.entity.Employee;
 import com.neb.entity.Payslip;
 import com.neb.entity.Work;
@@ -73,6 +79,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     
     @Value("${payslip.base-folder}")
     private String baseFolder;
+    
+    @Value("${task.attachment}")
+    private String attachmentFolder;
 
     // --------- LOGIN ----------
     /**
@@ -222,12 +231,61 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return updated Work entity with completion details
      * @throws CustomeException if task is not found
      */
+    /*
     public Work submitReport(Long taskId, SubmitTaskReportDto report, LocalDate submittedDate) {
         Work task = workRepository.findById(taskId).orElseThrow(() -> new CustomeException("Task not found with taskId :"+taskId));
         task.setReportDetails(report.getReportDetails());
         task.setSubmittedDate(submittedDate);
         task.setStatus(report.getStatus());
         return workRepository.save(task);
+    }
+    */
+    
+    @Override
+    public WorkResponseDto submitReport(Long taskId, String statusStr, String reportDetails, MultipartFile reportAttachment, LocalDate submittedDate) {
+        Work task = workRepository.findById(taskId)
+                .orElseThrow(() -> new CustomeException("Task not found with taskId: " + taskId));
+
+        task.setReportDetails(reportDetails);
+        task.setSubmittedDate(submittedDate);
+        task.setStatus(WorkStatus.valueOf(statusStr));
+
+        // Handle file upload
+        if (reportAttachment != null && !reportAttachment.isEmpty()) {
+            try {
+                String fileName = System.currentTimeMillis() + "_" + reportAttachment.getOriginalFilename();
+                Path uploadPath = Paths.get(attachmentFolder);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(reportAttachment.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                // Save relative URL for frontend access
+                String fileUrl = "/uploads/tasks/" + fileName;
+                task.setReportAttachmentUrl(fileUrl);
+            } catch (IOException e) {
+                throw new CustomeException("Failed to save attachment: " + e.getMessage());
+            }
+        }
+
+        Work savedWork = workRepository.save(task);
+        WorkResponseDto workRes = new WorkResponseDto();
+        
+        workRes.setId(savedWork.getId());
+        workRes.setTitle(savedWork.getTitle());
+        workRes.setAssignedDate(savedWork.getAssignedDate());
+        workRes.setDueDate(savedWork.getDueDate());
+        workRes.setStatus(savedWork.getStatus());
+        workRes.setReportDetails(savedWork.getReportDetails());
+        workRes.setSubmittedDate(savedWork.getSubmittedDate());
+        workRes.setReportAttachmentUrl(savedWork.getReportAttachmentUrl());
+        workRes.setAttachmentUrl(savedWork.getAttachmentUrl());
+        workRes.setEmployeeId(savedWork.getEmployee().getId());
+        workRes.setEmployeeName(savedWork.getEmployee().getFirstName());
+        workRes.setEmployeeEmail(savedWork.getEmployee().getEmail());
+        
+        return workRes ;
     }
 	 
 }

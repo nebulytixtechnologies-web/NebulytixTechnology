@@ -110,6 +110,7 @@ public class HrServiceImpl implements HrService{
         // map DTO to entity
        
         Employee emp = mapper.map(addEmpReq, Employee.class);
+        emp.setLoginRole("employee");
 
         // save entity
         Employee savedEmp = empRepo.save(emp);
@@ -245,30 +246,52 @@ public class HrServiceImpl implements HrService{
         Employee emp = empRepo.findById(id)
                 .orElseThrow(() -> new CustomeException("Employee not found with id: " + id));
 
-        // --- Update all fields from DTO ---
-        emp.setFirstName(updateReq.getFirstName());
-        emp.setLastName(updateReq.getLastName());
-        emp.setEmail(updateReq.getEmail());
-        emp.setMobile(updateReq.getMobile());
-        emp.setCardNumber(updateReq.getCardNumber());
-        emp.setLoginRole(updateReq.getLoginRole());
-        emp.setJobRole(updateReq.getJobRole());
-        emp.setDomain(updateReq.getDomain());
-        emp.setGender(updateReq.getGender());
-        emp.setJoiningDate(updateReq.getJoiningDate());
-        emp.setSalary(updateReq.getSalary());
-        emp.setDaysPresent(updateReq.getDaysPresent());
-        emp.setPaidLeaves(updateReq.getPaidLeaves());
-        emp.setPassword(updateReq.getPassword());
-        emp.setBankAccountNumber(updateReq.getBankAccountNumber());
-        emp.setBankName(updateReq.getBankName());
-        emp.setPfNumber(updateReq.getPfNumber());
-        emp.setPanNumber(updateReq.getPanNumber());
-        emp.setUanNumber(updateReq.getUanNumber());
-        emp.setEpsNumber(updateReq.getEpsNumber());
-        emp.setEsiNumber(updateReq.getEsiNumber());
+     // --- Update fields only if they are not null or empty ---
+        if (updateReq.getFirstName() != null && !updateReq.getFirstName().isEmpty())
+            emp.setFirstName(updateReq.getFirstName());
+        if (updateReq.getLastName() != null && !updateReq.getLastName().isEmpty())
+            emp.setLastName(updateReq.getLastName());
+        if (updateReq.getEmail() != null && !updateReq.getEmail().isEmpty())
+            emp.setEmail(updateReq.getEmail());
+        if (updateReq.getMobile() != null && !updateReq.getMobile().isEmpty())
+            emp.setMobile(updateReq.getMobile());
+        if (updateReq.getCardNumber() != null && !updateReq.getCardNumber().isEmpty())
+            emp.setCardNumber(updateReq.getCardNumber());
+        if (updateReq.getJobRole() != null && !updateReq.getJobRole().isEmpty())
+            emp.setJobRole(updateReq.getJobRole());
+        if (updateReq.getDomain() != null && !updateReq.getDomain().isEmpty())
+            emp.setDomain(updateReq.getDomain());
+        if (updateReq.getGender() != null && !updateReq.getGender().isEmpty())
+            emp.setGender(updateReq.getGender());
+        if (updateReq.getJoiningDate() != null)
+            emp.setJoiningDate(updateReq.getJoiningDate());
+        if (updateReq.getSalary() != null)
+            emp.setSalary(updateReq.getSalary());
+        if (updateReq.getDaysPresent() != 0)
+            emp.setDaysPresent(updateReq.getDaysPresent());
+        if (updateReq.getPaidLeaves() != 0)
+            emp.setPaidLeaves(updateReq.getPaidLeaves());
+        if (updateReq.getPassword() != null && !updateReq.getPassword().isEmpty())
+            emp.setPassword(updateReq.getPassword());
+        
+        // --- Bank & legal details ---
+        if (updateReq.getBankAccountNumber() != null && !updateReq.getBankAccountNumber().isEmpty())
+            emp.setBankAccountNumber(updateReq.getBankAccountNumber());
+        if (updateReq.getBankName() != null && !updateReq.getBankName().isEmpty())
+            emp.setBankName(updateReq.getBankName());
+        if (updateReq.getPfNumber() != null && !updateReq.getPfNumber().isEmpty())
+            emp.setPfNumber(updateReq.getPfNumber());
+        if (updateReq.getPanNumber() != null && !updateReq.getPanNumber().isEmpty())
+            emp.setPanNumber(updateReq.getPanNumber());
+        if (updateReq.getUanNumber() != null && !updateReq.getUanNumber().isEmpty())
+            emp.setUanNumber(updateReq.getUanNumber());
+        if (updateReq.getEpsNumber() != null && !updateReq.getEpsNumber().isEmpty())
+            emp.setEpsNumber(updateReq.getEpsNumber());
+        if (updateReq.getEsiNumber() != null && !updateReq.getEsiNumber().isEmpty())
+            emp.setEsiNumber(updateReq.getEsiNumber());
 
         Employee updatedEmp = empRepo.save(emp);
+
         return mapper.map(updatedEmp, EmployeeDetailsResponseDto.class);
     }
     

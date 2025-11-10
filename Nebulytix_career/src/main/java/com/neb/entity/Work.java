@@ -44,15 +44,18 @@ public class Work {
     private LocalDate dueDate;
 
     @Enumerated(EnumType.STRING)
-    private WorkStatus status; // ASSIGNED, IN_PROGRESS, COMPLETED, REPORTED
+    private WorkStatus status; // ASSIGNED, IN_PROGRESS, COMPLETED
 
     // Report Details
     private String reportDetails;
     private LocalDate submittedDate;
-
+    private String reportAttachmentUrl;
+   
     // Relation with Employee
     @ManyToOne
     @JoinColumn(name = "employee_id")
     @JsonIgnore
     private Employee employee;
+    
+    private String attachmentUrl;
 }

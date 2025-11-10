@@ -52,6 +52,8 @@ package com.neb.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.neb.dto.*;
 import com.neb.entity.*;
 
@@ -70,7 +72,7 @@ public interface EmployeeService {
     public List<Work> getTasksByEmployee(Long employeeId);
 
     // Submit task report after completion
-    public Work submitReport(Long taskId, SubmitTaskReportDto report, LocalDate submittedDate);
+    public WorkResponseDto submitReport(Long taskId, String status, String reportDetails, MultipartFile reportAttachment, LocalDate submittedDate);
 
     // Get employee details by email
     public EmployeeDetailsResponseDto getEmployeeByEmail(String email);

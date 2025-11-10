@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.neb.dto.EmployeeDetailsResponseDto;
 import com.neb.dto.EmployeeResponseDto;
@@ -23,6 +25,7 @@ import com.neb.dto.LoginRequestDto;
 import com.neb.dto.PayslipDto;
 import com.neb.dto.ResponseMessage;
 import com.neb.dto.SubmitTaskReportDto;
+import com.neb.dto.WorkResponseDto;
 import com.neb.entity.Employee;
 import com.neb.entity.Payslip;
 import com.neb.entity.Work;
@@ -143,18 +146,23 @@ public class EmployeeController {
      * @param reportData Work object containing report details submitted by the employee
      * @return A ResponseMessage containing updated Work information after report submission
      */
-    // Submit task report
+   
+   // Submit task report
     @PutMapping("/task/submit/{taskId}")
-    public ResponseMessage<Work> submitTaskReport(
+    public ResponseEntity<ResponseMessage<WorkResponseDto>> submitTaskReport(
             @PathVariable Long taskId,
-            @RequestBody SubmitTaskReportDto report
+            @RequestParam("status") String status,
+            @RequestParam("reportDetails") String reportDetails,
+            @RequestParam(value = "reportAttachment", required = false) MultipartFile reportAttachment
     ) {
-    	
-        Work updatedTask = employeeService.submitReport(taskId, report,  LocalDate.now());
-        return new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Report submitted successfully", updatedTask);
- 
+        WorkResponseDto updatedTask = employeeService.submitReport(taskId, status, reportDetails, reportAttachment, LocalDate.now());
+        ResponseMessage<WorkResponseDto> response = new ResponseMessage<>(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.name(),
+                "Report submitted successfully",
+                updatedTask
+        );
+        return ResponseEntity.ok(response);
     }
-    
-
 	 	
 }

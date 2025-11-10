@@ -45,8 +45,6 @@ public class AddEmployeeRequestDto {
     private String email;
     private String mobile;
     private String cardNumber;
-
-    private String loginRole;   // "hr" or "employee"
     private String jobRole;     // Required if loginRole = "employee"
     private String domain;      // Example: Java, .Net, Python
     private String gender;

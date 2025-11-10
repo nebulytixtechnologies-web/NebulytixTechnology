@@ -51,6 +51,8 @@ package com.neb.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.neb.dto.*;
 
 public interface AdminService {
@@ -65,10 +67,10 @@ public interface AdminService {
     public List<EmployeeDetailsResponseDto> getEmployeeList();
 
     // For assigning new work to an employee
-    public WorkResponseDto assignWork(AddWorkRequestDto request);
+    public String assignWork(AddWorkRequestDto request,MultipartFile file);
 
-    // For fetching all assigned works
-    public List<WorkResponseDto> getAllWorks();
+    // For fetching all assigned works to employee
+    public List<WorkResponseDto> getAllWorks(Long empId);
 
     // For fetching work details of a specific employee
     public List<WorkResponseDto> getWorkByEmployee(Long empId);
