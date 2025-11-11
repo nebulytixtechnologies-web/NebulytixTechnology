@@ -1,6 +1,5 @@
+//Job Entity
 package com.neb.entity;
-
-
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,5 +1,5 @@
 package com.neb.controller;
-//Origi
+//HrController
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.neb.dto.AddEmployeeRequestDto;
 import com.neb.dto.AddEmployeeResponseDto;
+import com.neb.dto.AddJobRequestDto;
 import com.neb.dto.EmployeeDetailsResponseDto;
 import com.neb.dto.EmployeeResponseDto;
 import com.neb.dto.GeneratePayslipRequest;
+import com.neb.dto.JobDetailsDto;
 import com.neb.dto.LoginRequestDto;
 import com.neb.dto.PayslipDto;
 import com.neb.dto.ResponseMessage;
@@ -245,5 +247,25 @@ public class HrController {
                         updatedEmp
                 )
         );
+    }
+    
+    @PostMapping("/addJob")
+    public ResponseEntity<ResponseMessage<JobDetailsDto>> addJob(@RequestBody AddJobRequestDto jobRequest) {
+        JobDetailsDto jobRes = service.addJob(jobRequest);
+        return ResponseEntity.ok(
+                new ResponseMessage<>(
+                        HttpStatus.OK.value(),
+                        HttpStatus.OK.name(),
+                        "Job added successfully",
+                        jobRes
+                )
+        );
+    }
+    
+    @GetMapping("/allJobs")
+    public ResponseEntity<ResponseMessage<List<JobDetailsDto>>> getJobList() {
+        List<JobDetailsDto> allJobs = service.getAllJobs();
+        return ResponseEntity.ok(new ResponseMessage<List<JobDetailsDto>>(HttpStatus.OK.value(), HttpStatus.OK.name(), "all jobs fetched successfully", allJobs));
+       
     }
 }

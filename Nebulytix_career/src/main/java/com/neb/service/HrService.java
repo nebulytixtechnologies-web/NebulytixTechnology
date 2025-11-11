@@ -59,7 +59,17 @@ package com.neb.service;
 
 import java.util.List;
 
-import com.neb.dto.*;
+import com.neb.dto.AddEmployeeRequestDto;
+import com.neb.dto.AddEmployeeResponseDto;
+import com.neb.dto.AddJobRequestDto;
+import com.neb.dto.EmployeeDetailsResponseDto;
+import com.neb.dto.EmployeeResponseDto;
+import com.neb.dto.JobDetailsDto;
+import com.neb.dto.LoginRequestDto;
+import com.neb.dto.PayslipDto;
+import com.neb.dto.UpdateBankDetailsRequestDto;
+import com.neb.dto.UpdatePasswordRequestDto;
+import com.neb.entity.Job;
 
 public interface HrService {
 
@@ -93,5 +103,7 @@ public interface HrService {
     EmployeeDetailsResponseDto updatePassword(Long id, UpdatePasswordRequestDto updatePasswordRequestDto);
     EmployeeDetailsResponseDto updateBankDetails(Long id, UpdateBankDetailsRequestDto bankDetailsDto);
 
+     public JobDetailsDto addJob(AddJobRequestDto jobRequestDto);
+     public List<JobDetailsDto> getAllJobs();
 
 }

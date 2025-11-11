@@ -3,6 +3,7 @@ package com.neb.service.impl;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,16 +13,20 @@ import org.springframework.stereotype.Service;
 
 import com.neb.dto.AddEmployeeRequestDto;
 import com.neb.dto.AddEmployeeResponseDto;
+import com.neb.dto.AddJobRequestDto;
 import com.neb.dto.EmployeeDetailsResponseDto;
 import com.neb.dto.EmployeeResponseDto;
+import com.neb.dto.JobDetailsDto;
 import com.neb.dto.LoginRequestDto;
 import com.neb.dto.PayslipDto;
 import com.neb.dto.UpdateBankDetailsRequestDto;
 import com.neb.dto.UpdatePasswordRequestDto;
 import com.neb.entity.Employee;
+import com.neb.entity.Job;
 import com.neb.entity.Payslip;
 import com.neb.exception.CustomeException;
 import com.neb.repo.EmployeeRepository;
+import com.neb.repo.JobRepository;
 import com.neb.repo.PayslipRepository;
 import com.neb.service.HrService;
 
@@ -63,6 +68,9 @@ public class HrServiceImpl implements HrService{
 	
 	@Autowired
 	private PayslipRepository payslipRepo;
+	
+	@Autowired
+	private JobRepository jobRepository;
 
     @Autowired
     private ModelMapper mapper;
@@ -337,6 +345,44 @@ public class HrServiceImpl implements HrService{
         // Return all details (not just bank info)
         return mapper.map(updatedEmp, EmployeeDetailsResponseDto.class);
     }
+
+	@Override
+	public JobDetailsDto addJob(AddJobRequestDto jobRequestDto) {
+		
+		//dto to entiry
+		Job job = mapper.map(jobRequestDto, Job.class);
+		job.setIsActive(true);
+		
+		LocalDate postedDate = jobRequestDto.getPostedDate() != null
+                ? jobRequestDto.getPostedDate()
+                : LocalDate.now();
+
+		job.setPostedDate(postedDate);
+		Job saveJob = jobRepository.save(job);
+		
+		JobDetailsDto jobDetailsRes = mapper.map(saveJob, JobDetailsDto.class);
+		
+		return jobDetailsRes;
+	}
+
+	@Override
+	public List<JobDetailsDto> getAllJobs() {
+		
+		List<Job> allJobs = jobRepository.findAll();
+		LocalDate today = LocalDate.now();
+		
+		List<JobDetailsDto> jobListRes= allJobs.stream().map(job->{
+			if (job.getClosingDate() != null && job.getClosingDate().isBefore(today)) {
+                job.setIsActive(false);
+            } else {
+                job.setIsActive(true);
+            }
+			return mapper.map(job, JobDetailsDto.class);
+		}).collect(Collectors.toList());
+		
+		
+		return jobListRes;
+	}
 
 
 }
