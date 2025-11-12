@@ -14,4 +14,3 @@ public class AddJobApplicationRequestDto {
     private String resumeFilePath;
     private String resumeFileName;
 }
-

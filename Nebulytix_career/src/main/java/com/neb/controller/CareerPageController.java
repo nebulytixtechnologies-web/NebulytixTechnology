@@ -47,9 +47,6 @@ public class CareerPageController {
                         job));
     }
 
-    /**
-     * ✅ Step 1: Apply for Job (Sends OTP to user email)
-     */
     @PostMapping("/applyJob")
     public ResponseEntity<ResponseMessage<AddJobApplicationResponseDto>> applyForJob(
             @RequestBody AddJobApplicationRequestDto requestDto) {
@@ -64,9 +61,6 @@ public class CareerPageController {
                         response));
     }
 
-    /**
-     * ✅ Step 2: Verify OTP (Final submission of job application)
-     */
     @PostMapping("/verifyOtp")
     public ResponseEntity<ResponseMessage<String>> verifyOtp(
             @RequestBody OtpVerificationRequestDto request) {
