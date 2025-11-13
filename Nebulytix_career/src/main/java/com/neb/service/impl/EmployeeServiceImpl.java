@@ -1,5 +1,6 @@
 package com.neb.service.impl;
 import java.io.IOException;
+import java.util.Optional;
 //original
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,9 +10,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +22,9 @@ import com.neb.constants.WorkStatus;
 import com.neb.dto.EmployeeDetailsResponseDto;
 import com.neb.dto.EmployeeResponseDto;
 import com.neb.dto.LoginRequestDto;
+import com.neb.dto.ResponseMessage;
 import com.neb.dto.SubmitTaskReportDto;
+import com.neb.dto.UpdateEmployeeRequestDto;
 import com.neb.dto.WorkResponseDto;
 import com.neb.entity.Employee;
 import com.neb.entity.Payslip;
@@ -75,6 +80,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     
     @Autowired
     private WorkRepository workRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     
     @Value("${payslip.base-folder}")
@@ -287,5 +294,51 @@ public class EmployeeServiceImpl implements EmployeeService {
         
         return workRes ;
     }
-	 
+
+
+    @Override
+    public EmployeeDetailsResponseDto updateEmployeeByHr(Long id, UpdateEmployeeRequestDto dto) {
+        Optional<Employee> optionalEmp = employeeRepository.findById(id);
+        if (optionalEmp.isEmpty()) {
+            return null; // Employee not found
+        }
+
+        Employee emp = optionalEmp.get();
+
+        // ✅ HR can update only non-bank fields
+        emp.setFirstName(dto.getFirstName());
+        emp.setLastName(dto.getLastName());
+        emp.setEmail(dto.getEmail());
+        emp.setMobile(dto.getMobile());
+        emp.setCardNumber(dto.getCardNumber());
+        emp.setJobRole(dto.getJobRole());
+        emp.setDomain(dto.getDomain());
+        emp.setGender(dto.getGender());
+        emp.setJoiningDate(dto.getJoiningDate());
+        emp.setSalary(dto.getSalary());
+        emp.setDaysPresent(dto.getDaysPresent());
+        emp.setPaidLeaves(dto.getPaidLeaves());
+        emp.setLoginRole(dto.getLoginRole());
+
+        employeeRepository.save(emp);
+
+        // ✅ Convert to Response DTO
+        EmployeeDetailsResponseDto response = new EmployeeDetailsResponseDto();
+        response.setId(emp.getId());
+        response.setFirstName(emp.getFirstName());
+        response.setLastName(emp.getLastName());
+        response.setEmail(emp.getEmail());
+        response.setMobile(emp.getMobile());
+        response.setCardNumber(emp.getCardNumber());
+        response.setJobRole(emp.getJobRole());
+        response.setDomain(emp.getDomain());
+        response.setGender(emp.getGender());
+        response.setJoiningDate(emp.getJoiningDate());
+        response.setSalary(emp.getSalary());
+        response.setDaysPresent(emp.getDaysPresent());
+        response.setPaidLeaves(emp.getPaidLeaves());
+        response.setLoginRole(emp.getLoginRole());
+
+        return response;
+    }
 }
