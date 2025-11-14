@@ -2,19 +2,20 @@ package com.neb.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.neb.dto.AddJobApplicationRequestDto;
 import com.neb.dto.AddJobApplicationResponseDto;
 import com.neb.dto.JobDetailsDto;
-import com.neb.dto.OtpVerificationRequestDto;
 import com.neb.dto.ResponseMessage;
 import com.neb.service.CareerPageService;
 
@@ -47,30 +48,20 @@ public class CareerPageController {
                         job));
     }
 
-    @PostMapping("/applyJob")
+    @PostMapping(path = "/applyJob", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseMessage<AddJobApplicationResponseDto>> applyForJob(
-            @RequestBody AddJobApplicationRequestDto requestDto) {
+            @RequestPart("data") AddJobApplicationRequestDto requestDto,
+            @RequestPart("resume") MultipartFile resume) {
 
-        AddJobApplicationResponseDto response = service.applyForJob(requestDto);
+        AddJobApplicationResponseDto resp = service.applyForJob(requestDto, resume);
 
-        return ResponseEntity.ok(
-                new ResponseMessage<>(
-                        HttpStatus.OK.value(),
-                        HttpStatus.OK.name(),
-                        "OTP sent successfully to your registered email.",
-                        response));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseMessage<AddJobApplicationResponseDto>(
+                        HttpStatus.CREATED.value(),
+                        HttpStatus.CREATED.name(),
+                        "Application submitted successfully",
+                        resp));
     }
-
-    @PostMapping("/verifyOtp")
-    public ResponseEntity<ResponseMessage<String>> verifyOtp(
-            @RequestBody OtpVerificationRequestDto request) {
-
-        String message = service.verifyOtp(request);
-
-        return ResponseEntity.ok(
-                new ResponseMessage<>(
-                        HttpStatus.OK.value(),
-                        HttpStatus.OK.name(),
-                        message));
-    }
+    
+    
 }

@@ -8,39 +8,6 @@ import com.neb.entity.Payslip;
 
 import lombok.Data;
 
-/**
- * ---------------------------------------------------------------
- * File Name   : AddEmployeeRequestDto.java
- * Package     : com.neb.dto
- * ---------------------------------------------------------------
- * Purpose :
- *   This class is used to collect and transfer employee details
- *   when a new employee is added to the system.
- *
- * Description :
- *   - It serves as a Data Transfer Object (DTO) between the frontend
- *     and backend during the employee registration process.
- *   - It holds all necessary details about an employee including
- *     personal, professional, salary, and bank information.
- *
- * Fields :
- *   firstName, lastName               → Basic employee identity details
- *   email, mobile, cardNumber         → Contact and identification information
- *   loginRole                         → Specifies the user type (admin/hr/employee)
- *   jobRole, domain                   → Professional role and work domain
- *   joiningDate, salary               → Employment details
- *   daysPresent, paidLeaves           → Attendance and leave information
- *   password                          → Used for authentication
- *   bankAccountNumber, bankName       → Bank details
- *   pfNumber, panNumber,
- *   uanNumber, epsNumber, esiNumber   → Government ID and statutory details
- *
- * Result :
- *   This DTO enables smooth transfer of all employee registration data
- *   from the frontend to the backend service for processing and storage.
- * ---------------------------------------------------------------
- */
-
 @Data
 public class PayslipDto {
 

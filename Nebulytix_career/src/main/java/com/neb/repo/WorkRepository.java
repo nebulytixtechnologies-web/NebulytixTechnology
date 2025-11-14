@@ -22,6 +22,7 @@
 
 package com.neb.repo;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.neb.entity.Employee;
@@ -31,4 +32,5 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
 
     List<Work> findByEmployeeId(Long employeeId);
     List<Work> findByEmployee(Employee emp);
+    List<Work> findBySubmittedDate(LocalDate submittedDate);
 }

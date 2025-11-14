@@ -10,7 +10,4 @@ public class AddJobApplicationRequestDto {
     private String fullName;
     private String email;
     private String phoneNumber;
-    private String linkedinUrl;
-    private String resumeFilePath;
-    private String resumeFileName;
 }

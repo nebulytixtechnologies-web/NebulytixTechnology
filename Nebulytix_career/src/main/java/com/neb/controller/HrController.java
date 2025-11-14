@@ -268,4 +268,6 @@ public class HrController {
         return ResponseEntity.ok(new ResponseMessage<List<JobDetailsDto>>(HttpStatus.OK.value(), HttpStatus.OK.name(), "all jobs fetched successfully", allJobs));
        
     }
+    
+    
 }

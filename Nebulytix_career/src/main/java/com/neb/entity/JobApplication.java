@@ -1,5 +1,6 @@
 package com.neb.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
@@ -25,9 +26,7 @@ public class JobApplication {
     private String fullName;
     private String email;
     private String phoneNumber;
-    private String linkedinUrl;
     private String resumeFilePath;
-    private String resumeFileName;
-    private LocalDateTime applicationDate;
+    private LocalDate applicationDate;
     private String status;// SUBMITTED, REVIEWED, INTERVIEW, REJECTED
 }

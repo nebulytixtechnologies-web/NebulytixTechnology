@@ -1,6 +1,6 @@
 package com.neb.service.impl;
 import java.io.IOException;
-//original
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,7 +19,6 @@ import com.neb.constants.WorkStatus;
 import com.neb.dto.EmployeeDetailsResponseDto;
 import com.neb.dto.EmployeeResponseDto;
 import com.neb.dto.LoginRequestDto;
-import com.neb.dto.SubmitTaskReportDto;
 import com.neb.dto.WorkResponseDto;
 import com.neb.entity.Employee;
 import com.neb.entity.Payslip;
@@ -30,36 +29,6 @@ import com.neb.repo.PayslipRepository;
 import com.neb.repo.WorkRepository;
 import com.neb.service.EmployeeService;
 import com.neb.util.PdfGeneratorUtil;
-
-/**
- * ---------------------------------------------------------------
- * File Name   : EmployeeServiceImpl.java
- * Package     : com.neb.service.impl
- * ---------------------------------------------------------------
- * Purpose :
- *   This class implements the business logic for employee-related 
- *   operations such as authentication, payslip generation, 
- *   task retrieval, and report submission.
- *
- * Description :
- *   - Implements the EmployeeService interface.
- *   - Handles login validation, payslip creation (including 
- *     PDF generation and storage), and employee work management.
- *   - Uses repositories for database interaction and ModelMapper 
- *     for mapping between entities and DTOs.
- *
- * Dependencies :
- *   - EmployeeRepository → For performing CRUD operations on employees.
- *   - PayslipRepository  → For storing and retrieving payslip data.
- *   - WorkRepository     → For handling employee task details.
- *   - ModelMapper        → For entity-to-DTO conversion.
- *   - PdfGeneratorUtil   → For generating employee payslip PDFs.
- *
- * Result :
- *   Provides a full implementation for employee functionalities, 
- *   ensuring smooth integration between backend data and UI components.
- * ---------------------------------------------------------------
- */
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -84,13 +53,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     private String attachmentFolder;
 
     // --------- LOGIN ----------
-    /**
-     * Validates the login credentials for employees, HR, or admins.
-     *
-     * @param loginReq contains email, password, and login role
-     * @return EmployeeResponseDto containing the logged-in employee’s details
-     * @throws CustomeException if credentials are invalid
-     */
     @Override
     public EmployeeResponseDto login(LoginRequestDto loginReq) {
 
@@ -109,31 +71,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     
     
     //Getting employee By ID
-    /**
-     * Retrieves employee details by employee ID.
-     *
-     * @param id the employee’s unique ID
-     * @return Employee entity corresponding to the given ID
-     * @throws CustomeException if employee is not found
-     */
+    
     public Employee getEmployeeById(Long id) {
         return empRepo.findById(id).orElseThrow(() -> new CustomeException("Employee not found with id: "+id));
     }
-    
-    /**
-     * Generates a payslip for the given employee and month.
-     *
-     * The method calculates salary components like basic, HRA, flexi, 
-     * deductions, and net salary. It then generates a PDF payslip and 
-     * saves it to the configured directory.
-     * 
-     *
-     * @param employeeId ID of the employee for whom payslip is generated
-     * @param monthYear  the month and year for which the payslip is created
-     * @return Payslip entity containing salary breakdown and PDF file info
-     * @throws Exception if file generation or saving fails
-     * @throws CustomeException if employee is not found
-     */
+   
 	@Override
 	public Payslip generatePayslip(Long employeeId, String monthYear) throws Exception{
 		
@@ -189,27 +131,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return p;
 	}
 	 // Get employee details by EMAIL
-	 /**
-     * Retrieves employee details using their email ID.
-     *
-     * @param email employee email address
-     * @return EmployeeDetailsResponseDto containing employee information
-     * @throws CustomeException if employee with given email is not found
-     */
     public EmployeeDetailsResponseDto getEmployeeByEmail(String email) {
     	System.out.println(email);
     	Employee emp = empRepo.findByEmail(email).orElseThrow(()->new CustomeException("Employee not found with email id :"+email));
     	EmployeeDetailsResponseDto empdetailsDto = mapper.map(emp, EmployeeDetailsResponseDto.class);
         return empdetailsDto;
     }
-   
-    /**
-     * Fetches all work/tasks assigned to a specific employee.
-     *
-     * @param employeeId the employee ID
-     * @return list of Work entities assigned to the employee
-     * @throws CustomeException if no work is found for the employee
-     */
+  
     public List<Work> getTasksByEmployee(Long employeeId) {
         Employee emp = getEmployeeById(employeeId);
         List<Work> workListbyEmployee = workRepository.findByEmployee(emp);
@@ -218,28 +146,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return workListbyEmployee;
     }
-
-    /**
-     * Submits a task report for the given task ID.
-     *
-     * Updates the work status to COMPLETED and stores the report details 
-     * along with the submitted date.
-     * 
-     * @param taskId ID of the task being submitted
-     * @param reportDetails report or description submitted by the employee
-     * @param submittedDate date when the report was submitted
-     * @return updated Work entity with completion details
-     * @throws CustomeException if task is not found
-     */
-    /*
-    public Work submitReport(Long taskId, SubmitTaskReportDto report, LocalDate submittedDate) {
-        Work task = workRepository.findById(taskId).orElseThrow(() -> new CustomeException("Task not found with taskId :"+taskId));
-        task.setReportDetails(report.getReportDetails());
-        task.setSubmittedDate(submittedDate);
-        task.setStatus(report.getStatus());
-        return workRepository.save(task);
-    }
-    */
     
     @Override
     public WorkResponseDto submitReport(Long taskId, String statusStr, String reportDetails, MultipartFile reportAttachment, LocalDate submittedDate) {

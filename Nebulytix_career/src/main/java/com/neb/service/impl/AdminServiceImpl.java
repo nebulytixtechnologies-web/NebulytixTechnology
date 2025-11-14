@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-//original 
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-//import com.itextpdf.text.pdf.StringUtils;
 import com.neb.constants.WorkStatus;
 import com.neb.dto.AddEmployeeRequestDto;
 import com.neb.dto.AddEmployeeResponseDto;
@@ -35,33 +34,9 @@ import com.neb.exception.CustomeException;
 import com.neb.repo.EmployeeRepository;
 import com.neb.repo.WorkRepository;
 import com.neb.service.AdminService;
+import com.neb.util.ReportGeneratorPdf;
 
-/**
- * ---------------------------------------------------------------
- * File Name   : AdminServiceImpl.java
- * Package     : com.neb.service.impl
- * ---------------------------------------------------------------
- * Purpose :
- *   This class provides the business logic implementation for
- *   administrative operations such as login, employee management,
- *   and work (task) assignment.
- *
- * Description :
- *   - Implements the AdminService interface.
- *   - Handles employee CRUD operations and assigns tasks to employees.
- *   - Uses repositories for database interaction and ModelMapper
- *     for converting entities to DTOs and vice versa.
- *
- * Dependencies :
- *   - EmployeeRepository → To perform database operations on Employee entities.
- *   - WorkRepository     → To manage Work (task) entities.
- *   - ModelMapper        → For mapping between entity and DTO objects.
- *
- * Result :
- *   Provides a complete implementation for admin-related operations,
- *   ensuring clean separation between service logic and data access.
- * ---------------------------------------------------------------
- */
+
 @Service
 public class AdminServiceImpl implements AdminService{
 
@@ -76,15 +51,6 @@ public class AdminServiceImpl implements AdminService{
     
     @Value("${task.attachment}")
     private String uploadDir;
-    
-    
-    /**
-     * Validates login credentials for Admin, HR, or Employee.
-     * 
-     * @param loginReq contains email, password, and login role
-     * @return EmployeeResponseDto with employee details if valid
-     * @throws CustomeException if credentials are invalid
-     */
     
      // --------- LOGIN ----------
     @Override
@@ -103,13 +69,7 @@ public class AdminServiceImpl implements AdminService{
         return loginRes;
     }
     
-    /**
-     * Adds a new employee to the system.
-     * 
-     * @param addEmpReq details of the new employee
-     * @return AddEmployeeResponseDto containing saved employee data
-     * @throws CustomeException if an employee with the same email already exists
-     */
+   
     // --------- ADD EMPLOYEE ----------
     @Override
     public AddEmployeeResponseDto addEmployee(AddEmployeeRequestDto addEmpReq) {
@@ -132,12 +92,6 @@ public class AdminServiceImpl implements AdminService{
         return addEmpRes;
     }
      
-    /**
-     * Retrieves a list of all employees (excluding admin).
-     * 
-     * @return list of EmployeeDetailsResponseDto
-     * @throws CustomeException if no employees are found
-     */
      //  ----------Get Employee List-------------
 	@Override
 	public List<EmployeeDetailsResponseDto> getEmployeeList() {
@@ -158,16 +112,7 @@ public class AdminServiceImpl implements AdminService{
 	    return empListRes;
 	}
 	
-	
-               //............. adding work ..............
-	 /**
-     * Assigns a new work/task to an employee.
-     * 
-     * @param request contains task details and employee ID
-     * @return WorkResponseDto with assigned task details
-     * @throws CustomeException if the employee ID is invalid
-     */
-	
+           //............. adding work ..............
     public String assignWork(AddWorkRequestDto request,MultipartFile file) {
         Employee emp = empRepo.findById(request.getEmployeeId())
                 .orElseThrow(() -> new CustomeException("Employee not found with id :"+request.getEmployeeId()));
@@ -215,12 +160,6 @@ public class AdminServiceImpl implements AdminService{
         return "failed to assign task";
     }
 
-    /**
-     * Fetches all assigned work/tasks.
-     * 
-     * @return list of WorkResponseDto
-     * @throws CustomeException if no works are found
-     */ 
     public List<WorkResponseDto> getAllWorks(Long empId) {
     	List<Work> allWork = workRepo.findByEmployeeId(empId);
     	if(allWork==null) {
@@ -233,13 +172,6 @@ public class AdminServiceImpl implements AdminService{
     	
     }
 
-    /**
-     * Fetches all works assigned to a specific employee.
-     * 
-     * @param empId employee ID
-     * @return list of WorkResponseDto
-     * @throws CustomeException if no works are found for the employee
-     */
     public List<WorkResponseDto> getWorkByEmployee(Long empId) {
     	
     	List<Work> workListByEmployeeId = workRepo.findByEmployeeId(empId);
@@ -253,13 +185,7 @@ public class AdminServiceImpl implements AdminService{
     
     }
     
-    /**
-     * Helper method to convert Work entity to WorkResponseDto.
-     * 
-     * @param work Work entity
-     * @return mapped WorkResponseDto
-     */
-    
+   
     private WorkResponseDto mapToDto(Work work) {
         WorkResponseDto dto = new WorkResponseDto();
         dto.setId(work.getId());
@@ -326,6 +252,18 @@ public class AdminServiceImpl implements AdminService{
 		Employee emp = empRepo.findById(id).orElseThrow(()->new CustomeException("Employee not founce wuith id :"+id));
 		return mapper.map(emp, EmployeeDetailsResponseDto.class);
 		
+	}
+
+	@Override
+	public byte[] generateDailyReport(LocalDate date) throws Exception {
+	    List<Work> works = workRepo.findBySubmittedDate(date);
+	    if (works == null || works.isEmpty()) {
+	        // error handling
+	    }
+	    ReportGeneratorPdf pdfGenerator = new ReportGeneratorPdf();
+	    byte[] dailyReportPDF = pdfGenerator.generateDailyReportPDF(works, date);
+	    return dailyReportPDF;
+
 	}
 	
 	}
