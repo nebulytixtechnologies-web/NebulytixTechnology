@@ -1,5 +1,4 @@
 package com.neb.controller;
-//original
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,139 +28,158 @@ import com.neb.entity.Employee;
 import com.neb.entity.Payslip;
 import com.neb.entity.Work;
 import com.neb.service.EmployeeService;
+import com.neb.util.SessionUtil;
+
+import jakarta.servlet.http.HttpSession;
 
 /**
  * =====================================================
  *                   EmployeeController
  * =====================================================
- * 
- * 
- * This REST controller manages all endpoints related to 
- * employee operations in the NEB HR Management System.
- * 
- * 
- * Responsibilities:
- *    -- Handle employee authentication
- *    -- Provide employee details and assigned work
- *    -- Generate monthly payslips
- *    -- Allow employees to submit work reports
- * 
- * 
- *
- * This controller acts as an interface between the front-end 
- * (React/Vue/Angular) and the service layer {@link EmployeeService}.
- * 
- * 
- * 
- * CORS is enabled for requests originating from 
- *  http://localhost:5173, which is typically your frontend development server.
- * 
  */
 @RestController
 @RequestMapping("/api/employee")
 @CrossOrigin(origins = "http://localhost:5173")
 public class EmployeeController {
-	/** Injected service layer dependency for employee operations */
-	@Autowired
-	private EmployeeService employeeService;
-	
-	 /**
-     * Handles employee login requests.
-     *
-     * @param loginReq DTO containing login credentials (email and password)
-     * @return A ResponseEntity with login success message and employee details
-     */
-	@PostMapping("/login")
-	public ResponseEntity<ResponseMessage<EmployeeResponseDto>> login(@RequestBody LoginRequestDto loginReq){
-		
-		EmployeeResponseDto loginRes = employeeService.login(loginReq);
-		
-		return ResponseEntity.ok(new ResponseMessage<EmployeeResponseDto>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Employee login successfully", loginRes));
-	}
-	
-	/**
-     * Generates a payslip for an employee for a specific month and year.
-     *
-     * @param request DTO containing employee ID and month-year for which payslip is to be generated
-     * @return A ResponseEntity with the generated PayslipDto
-     * @throws Exception If payslip generation fails or employee not found
-     */
-	@PostMapping("/payslip/generate")
-    public ResponseEntity<PayslipDto> generate(@RequestBody GeneratePayslipRequest request) throws Exception {
-        System.out.println(request);
-		Payslip p = employeeService.generatePayslip(request.getEmployeeId(), request.getMonthYear());
+
+    @Autowired
+    private EmployeeService employeeService;
+
+    // ============================================================
+    //  LOGIN — session added here
+    // ============================================================
+    @PostMapping("/login")
+    public ResponseEntity<ResponseMessage<EmployeeResponseDto>> login(
+            @RequestBody LoginRequestDto loginReq,
+            HttpSession session) {
+
+        EmployeeResponseDto loginRes = employeeService.login(loginReq);
+
+        //  MODIFIED — storing session values
+        session.setAttribute("userId", loginRes.getId());
+        session.setAttribute("role", "EMPLOYEE");
+        session.setAttribute("email", loginRes.getEmail());
+
+        return ResponseEntity.ok(
+                new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(),
+                        "Employee login successfully", loginRes));
+    }
+
+    // ============================================================
+    //  Generate Payslip — session check added
+    // ============================================================
+    @PostMapping("/payslip/generate")
+    public ResponseEntity<?> generate(
+            @RequestBody GeneratePayslipRequest request,
+            HttpSession session) throws Exception {
+
+        // 🔥 MODIFIED — Session validation
+        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Employee session not found or expired");
+        }
+
+        Payslip p = employeeService.generatePayslip(request.getEmployeeId(), request.getMonthYear());
         PayslipDto dto = PayslipDto.fromEntity(p);
         return ResponseEntity.ok(dto);
     }
-	
-	 /**
-     * Fetches employee details by their ID.
-     *
-     * @param id The unique ID of the employee
-     * @return A ResponseMessage containing employee entity details
-     */
-	 // Get employee details
+
+    // ============================================================
+    //  Get employee details — session check added
+    // ============================================================
     @GetMapping("/get/{id}")
-    public ResponseMessage<Employee> getEmployee(@PathVariable Long id) {
+    public ResponseEntity<?> getEmployee(
+            @PathVariable Long id,
+            HttpSession session) {
+
+        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Employee session not found or expired");
+        }
+
         Employee emp = employeeService.getEmployeeById(id);
-        return new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Employee fetched successfully", emp);
+        return ResponseEntity.ok(
+                new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(),
+                        "Employee fetched successfully", emp));
     }
-    
-    /**
-     * Fetches employee details by their email address.
-     *
-     * @param email Employee’s email address
-     * @return A ResponseEntity with employee details or NOT_FOUND if no employee exists with the given email
-     */
+
+    // ============================================================
+    //  Get employee by email — session check added
+    // ============================================================
     @GetMapping("/details/{email}")
-    public ResponseEntity<ResponseMessage<EmployeeDetailsResponseDto>> getEmployeeByEmail(@PathVariable String email) {
-    	EmployeeDetailsResponseDto emp = employeeService.getEmployeeByEmail(email);	
+    public ResponseEntity<?> getEmployeeByEmail(
+            @PathVariable String email,
+            HttpSession session) {
+
+        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Employee session not found or expired");
+        }
+
+        EmployeeDetailsResponseDto emp = employeeService.getEmployeeByEmail(email);
         if (emp == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ResponseMessage<>(404, "NOT_FOUND", "Employee not found"));
         }
+
         return ResponseEntity.ok(
-                new ResponseMessage<>(200, "OK", "Employee fetched successfully", emp)
-        );
+                new ResponseMessage<>(200, "OK", "Employee fetched successfully", emp));
     }
-    
-    /**
-     * Retrieves the list of tasks assigned to a specific employee.
-     *
-     * @param employeeId The ID of the employee
-     * @return A ResponseMessage containing the list of Work objects assigned to the employee
-     */
-    // Get tasks assigned to employee
+
+    // ============================================================
+    //  Get tasks — session check added
+    // ============================================================
     @GetMapping("/tasks/{employeeId}")
-    public ResponseMessage<List<Work>> getTasks(@PathVariable Long employeeId) {
+    public ResponseEntity<?> getTasks(
+            @PathVariable Long employeeId,
+            HttpSession session) {
+
+        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Employee session not found or expired");
+        }
+
         List<Work> tasks = employeeService.getTasksByEmployee(employeeId);
-        return new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Tasks fetched successfully", tasks);
+        return ResponseEntity.ok(
+                new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(),
+                        "Tasks fetched successfully", tasks));
     }
-    
-    /**
-     * Submits a report for a specific assigned task.
-     *
-     * @param taskId The ID of the task being reported
-     * @param reportData Work object containing report details submitted by the employee
-     * @return A ResponseMessage containing updated Work information after report submission
-     */
-   
-   // Submit task report
+
+    // ============================================================
+    //  Submit report — session check added
+    // ============================================================
     @PutMapping("/task/submit/{taskId}")
-    public ResponseEntity<ResponseMessage<WorkResponseDto>> submitTaskReport(
+    public ResponseEntity<?> submitTaskReport(
             @PathVariable Long taskId,
             @RequestParam("status") String status,
             @RequestParam("reportDetails") String reportDetails,
-            @RequestParam(value = "reportAttachment", required = false) MultipartFile reportAttachment
-    ) {
-        WorkResponseDto updatedTask = employeeService.submitReport(taskId, status, reportDetails, reportAttachment, LocalDate.now());
+            @RequestParam(value = "reportAttachment", required = false) MultipartFile reportAttachment,
+            HttpSession session) {
+
+        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Employee session not found or expired");
+        }
+
+        WorkResponseDto updatedTask = employeeService.submitReport(
+                taskId, status, reportDetails, reportAttachment, LocalDate.now());
+
         ResponseMessage<WorkResponseDto> response = new ResponseMessage<>(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.name(),
                 "Report submitted successfully",
                 updatedTask
         );
+
         return ResponseEntity.ok(response);
     }
-	 	
+
+    // ============================================================
+    //LOGOUT — added
+    // ============================================================
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate();   //  MODIFIED
+        return ResponseEntity.ok("Employee logged out successfully");
+    }
 }
