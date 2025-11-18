@@ -32,61 +32,31 @@ import com.neb.util.SessionUtil;
 
 import jakarta.servlet.http.HttpSession;
 
-/**
- * =====================================================
- *                   EmployeeController
- * =====================================================
- */
 @RestController
 @RequestMapping("/api/employee")
 @CrossOrigin(origins = "http://localhost:5173")
 public class EmployeeController {
-
-    @Autowired
-    private EmployeeService employeeService;
-
-    // ============================================================
-    //  LOGIN — session added here
-    // ============================================================
-    @PostMapping("/login")
-    public ResponseEntity<ResponseMessage<EmployeeResponseDto>> login(
-            @RequestBody LoginRequestDto loginReq,
-            HttpSession session) {
-
-        EmployeeResponseDto loginRes = employeeService.login(loginReq);
-
-        //  MODIFIED — storing session values
-        session.setAttribute("userId", loginRes.getId());
-        session.setAttribute("role", "EMPLOYEE");
-        session.setAttribute("email", loginRes.getEmail());
-
-        return ResponseEntity.ok(
-                new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(),
-                        "Employee login successfully", loginRes));
-    }
-
-    // ============================================================
-    //  Generate Payslip — session check added
-    // ============================================================
-    @PostMapping("/payslip/generate")
-    public ResponseEntity<?> generate(
-            @RequestBody GeneratePayslipRequest request,
-            HttpSession session) throws Exception {
-
-        // 🔥 MODIFIED — Session validation
-        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
-            return ResponseEntity.status(401)
-                    .body("Unauthorized: Employee session not found or expired");
-        }
-
-        Payslip p = employeeService.generatePayslip(request.getEmployeeId(), request.getMonthYear());
+	/** Injected service layer dependency for employee operations */
+	@Autowired
+	private EmployeeService employeeService;
+	
+	@PostMapping("/login")
+	public ResponseEntity<ResponseMessage<EmployeeResponseDto>> login(@RequestBody LoginRequestDto loginReq){
+		
+		EmployeeResponseDto loginRes = employeeService.login(loginReq);
+		
+		return ResponseEntity.ok(new ResponseMessage<EmployeeResponseDto>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Employee login successfully", loginRes));
+	}
+	
+	@PostMapping("/payslip/generate")
+    public ResponseEntity<PayslipDto> generate(@RequestBody GeneratePayslipRequest request) throws Exception {
+        System.out.println(request);
+		Payslip p = employeeService.generatePayslip(request.getEmployeeId(), request.getMonthYear());
         PayslipDto dto = PayslipDto.fromEntity(p);
         return ResponseEntity.ok(dto);
     }
-
-    // ============================================================
-    //  Get employee details — session check added
-    // ============================================================
+	
+	 // Get employee details
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getEmployee(
             @PathVariable Long id,
@@ -102,10 +72,7 @@ public class EmployeeController {
                 new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(),
                         "Employee fetched successfully", emp));
     }
-
-    // ============================================================
-    //  Get employee by email — session check added
-    // ============================================================
+    
     @GetMapping("/details/{email}")
     public ResponseEntity<?> getEmployeeByEmail(
             @PathVariable String email,
@@ -125,10 +92,8 @@ public class EmployeeController {
         return ResponseEntity.ok(
                 new ResponseMessage<>(200, "OK", "Employee fetched successfully", emp));
     }
-
-    // ============================================================
-    //  Get tasks — session check added
-    // ============================================================
+    
+    // Get tasks assigned to employee
     @GetMapping("/tasks/{employeeId}")
     public ResponseEntity<?> getTasks(
             @PathVariable Long employeeId,
@@ -144,10 +109,8 @@ public class EmployeeController {
                 new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(),
                         "Tasks fetched successfully", tasks));
     }
-
-    // ============================================================
-    //  Submit report — session check added
-    // ============================================================
+    
+   // Submit task report
     @PutMapping("/task/submit/{taskId}")
     public ResponseEntity<?> submitTaskReport(
             @PathVariable Long taskId,

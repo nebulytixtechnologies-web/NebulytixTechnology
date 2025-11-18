@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -27,8 +28,13 @@ public class Job {
     private String domain;//java,python,.net
     private String jobType;// FULL_TIME, PART_TIME, CONTRACT
     private String experienceLevel;// ENTRY, MID, SENIOR
+    
+    @Column(length=4000)
     private String description;
+    @Column(length=4000)
     private String requirements;
+    
+    @Column(length=4000)
     private String responsibilities;
     private String salaryRange;
     private Boolean isActive;

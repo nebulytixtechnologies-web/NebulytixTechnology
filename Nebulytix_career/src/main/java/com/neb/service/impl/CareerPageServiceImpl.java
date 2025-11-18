@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.neb.dto.AddJobApplicationRequestDto;
 import com.neb.dto.AddJobApplicationResponseDto;
+import com.neb.dto.JobApplicationDto;
 import com.neb.dto.JobDetailsDto;
 
 import com.neb.entity.Job;
@@ -96,7 +99,7 @@ public class CareerPageServiceImpl implements CareerPageService {
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(resume.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-                application.setResumeFilePath("/uploads/tasks/" + fileName);
+                application.setResumeFilePath("/uploads/resumes/" + fileName);
 
             }catch (IOException ex) {
                 throw new CustomeException("Could not store file. Error: " + ex.getMessage());
@@ -112,4 +115,28 @@ public class CareerPageServiceImpl implements CareerPageService {
 
 		return applicationRes;
 	}  
+	
+	@Override
+	public List<JobApplicationDto> getApplicationsByJobId(Long jobId){
+
+	    Job job = jobRepository.findById(jobId)
+	            .orElseThrow(() -> new CustomeException("Job not found with ID: " + jobId));
+
+	    List<JobApplication> apps = job.getApplications();
+	    
+	    List<JobApplicationDto> applicationsResponse = apps.stream().map(app->{
+	    	JobApplicationDto dto = new JobApplicationDto();
+	        dto.setId(app.getId());
+	        dto.setFullName(app.getFullName());
+	        dto.setEmail(app.getEmail());
+	        dto.setPhoneNumber(app.getPhoneNumber());
+	        dto.setApplicationDate(app.getApplicationDate());
+	        dto.setStatus(app.getStatus());
+	        dto.setResumeUrl(app.getResumeFilePath());
+	        
+	        return dto;
+	    }).collect(Collectors.toList());
+	    
+	    return applicationsResponse;
+	}
 }

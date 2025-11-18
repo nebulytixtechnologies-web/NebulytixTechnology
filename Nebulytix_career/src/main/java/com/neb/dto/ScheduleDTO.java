@@ -1,14 +1,4 @@
-/**
- * --------------------------------------------------------------
- * Purpose :
- *   Data Transfer Object (DTO) for transferring schedule data
- *   between frontend and backend without exposing entity relationships.
- *
- * Description :
- *   - Used in ScheduleController for request and response payloads.
- *   - Keeps API payloads lightweight and avoids circular references.
- * --------------------------------------------------------------
- */
+
 
 package com.neb.dto;
 

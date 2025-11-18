@@ -1,32 +1,10 @@
 package com.neb.dto;
 
+import lombok.Data;
 
-
-/**
- * ------------------------------------------------------------
- * File Name   : UpdatePasswordRequestDto.java
- * Package     : com.neb.dto
- * ------------------------------------------------------------
- * Purpose :
- *   This DTO carries data required for updating an employee’s
- *   password based on employee ID.
- *
- * Fields :
- *   - password : the new password to set
- *
- * ------------------------------------------------------------
- */
-
+@Data
 public class UpdatePasswordRequestDto {
 
     private String password;
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
 
