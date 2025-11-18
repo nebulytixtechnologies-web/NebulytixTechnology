@@ -1,5 +1,4 @@
 package com.neb.controller;
-//original
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +28,9 @@ import com.neb.entity.Employee;
 import com.neb.entity.Payslip;
 import com.neb.entity.Work;
 import com.neb.service.EmployeeService;
+import com.neb.util.SessionUtil;
+
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api/employee")
@@ -56,46 +58,91 @@ public class EmployeeController {
 	
 	 // Get employee details
     @GetMapping("/get/{id}")
-    public ResponseMessage<Employee> getEmployee(@PathVariable Long id) {
+    public ResponseEntity<?> getEmployee(
+            @PathVariable Long id,
+            HttpSession session) {
+
+        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Employee session not found or expired");
+        }
+
         Employee emp = employeeService.getEmployeeById(id);
-        return new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Employee fetched successfully", emp);
+        return ResponseEntity.ok(
+                new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(),
+                        "Employee fetched successfully", emp));
     }
     
     @GetMapping("/details/{email}")
-    public ResponseEntity<ResponseMessage<EmployeeDetailsResponseDto>> getEmployeeByEmail(@PathVariable String email) {
-    	EmployeeDetailsResponseDto emp = employeeService.getEmployeeByEmail(email);	
+    public ResponseEntity<?> getEmployeeByEmail(
+            @PathVariable String email,
+            HttpSession session) {
+
+        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Employee session not found or expired");
+        }
+
+        EmployeeDetailsResponseDto emp = employeeService.getEmployeeByEmail(email);
         if (emp == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ResponseMessage<>(404, "NOT_FOUND", "Employee not found"));
         }
+
         return ResponseEntity.ok(
-                new ResponseMessage<>(200, "OK", "Employee fetched successfully", emp)
-        );
+                new ResponseMessage<>(200, "OK", "Employee fetched successfully", emp));
     }
     
     // Get tasks assigned to employee
     @GetMapping("/tasks/{employeeId}")
-    public ResponseMessage<List<Work>> getTasks(@PathVariable Long employeeId) {
+    public ResponseEntity<?> getTasks(
+            @PathVariable Long employeeId,
+            HttpSession session) {
+
+        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Employee session not found or expired");
+        }
+
         List<Work> tasks = employeeService.getTasksByEmployee(employeeId);
-        return new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Tasks fetched successfully", tasks);
+        return ResponseEntity.ok(
+                new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(),
+                        "Tasks fetched successfully", tasks));
     }
     
    // Submit task report
     @PutMapping("/task/submit/{taskId}")
-    public ResponseEntity<ResponseMessage<WorkResponseDto>> submitTaskReport(
+    public ResponseEntity<?> submitTaskReport(
             @PathVariable Long taskId,
             @RequestParam("status") String status,
             @RequestParam("reportDetails") String reportDetails,
-            @RequestParam(value = "reportAttachment", required = false) MultipartFile reportAttachment
-    ) {
-        WorkResponseDto updatedTask = employeeService.submitReport(taskId, status, reportDetails, reportAttachment, LocalDate.now());
+            @RequestParam(value = "reportAttachment", required = false) MultipartFile reportAttachment,
+            HttpSession session) {
+
+        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.isEmployee(session)) {
+            return ResponseEntity.status(401)
+                    .body("Unauthorized: Employee session not found or expired");
+        }
+
+        WorkResponseDto updatedTask = employeeService.submitReport(
+                taskId, status, reportDetails, reportAttachment, LocalDate.now());
+
         ResponseMessage<WorkResponseDto> response = new ResponseMessage<>(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.name(),
                 "Report submitted successfully",
                 updatedTask
         );
+
         return ResponseEntity.ok(response);
     }
-	 	
+
+    // ============================================================
+    //LOGOUT — added
+    // ============================================================
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate();   //  MODIFIED
+        return ResponseEntity.ok("Employee logged out successfully");
+    }
 }

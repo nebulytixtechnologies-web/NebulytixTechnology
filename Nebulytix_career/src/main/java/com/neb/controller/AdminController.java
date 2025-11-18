@@ -1,4 +1,4 @@
-//admin controller
+// 🔹 Admin Controller
 package com.neb.controller;
 
 import java.io.IOException;
