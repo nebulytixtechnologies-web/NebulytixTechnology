@@ -1,59 +1,3 @@
-/**
- * ---------------------------------------------------------------------
- * File Name   : HrService.java
- * Package     : com.neb.service
- * ---------------------------------------------------------------------
- * Purpose :
- *   This interface defines the operations that the HR (Human Resources)
- *   department can perform in the application.
- *
- * Description :
- *   The HrService interface includes methods for:
- *     - HR login
- *     - Adding, updating, and deleting employees
- *     - Viewing employee details
- *     - Managing attendance
- *     - Handling payslips (listing and downloading)
- *
- * Each method in this interface helps the HR team manage 
- * employee records, attendance, and salary slips.
- *
- * ---------------------------------------------------------------------
- * Methods :
- *
- * 1. AddEmployeeResponseDto addEmployee(AddEmployeeRequestDto addEmpReq)
- *      → Adds a new employee to the system.
- *
- * 2. EmployeeResponseDto login(LoginRequestDto loginReq)
- *      → Allows HR to log in using credentials.
- *
- * 3. List<EmployeeDetailsResponseDto> getEmployeeList()
- *      → Retrieves the complete list of employees.
- *
- * 4. EmployeeDetailsResponseDto getEmployee(Long id)
- *      → Fetches a specific employee’s details using their ID.
- *
- * 5. String deleteById(Long id)
- *      → Deletes an employee record from the database.
- *
- * 6. byte[] downloadPayslip(Long payslipId)
- *      → Downloads the payslip file (PDF) for a given payslip ID.
- *
- * 7. List<PayslipDto> listPayslipsForEmployee(Long employeeId)
- *      → Retrieves all payslips belonging to a particular employee.
- *
- * 8. EmployeeDetailsResponseDto addAttendence(Long id, int days)
- *      → Adds or updates the attendance record (days present) for an employee.
- *
- * 9. EmployeeDetailsResponseDto updateEmployee(Long id, AddEmployeeRequestDto updateReq)
- *      → Updates an employee’s information such as role, domain, etc.
- *
- * ---------------------------------------------------------------------
- * Usage :
- *   This interface is implemented by a class (e.g., HrServiceImpl)
- *   which contains the actual business logic for these operations.
- * ---------------------------------------------------------------------
- */
 
 package com.neb.service;
 
@@ -68,8 +12,8 @@ import com.neb.dto.JobDetailsDto;
 import com.neb.dto.LoginRequestDto;
 import com.neb.dto.PayslipDto;
 import com.neb.dto.UpdateBankDetailsRequestDto;
+import com.neb.dto.UpdateEmployeeRequestDto;
 import com.neb.dto.UpdatePasswordRequestDto;
-import com.neb.entity.Job;
 
 public interface HrService {
 
@@ -98,7 +42,7 @@ public interface HrService {
     public EmployeeDetailsResponseDto addAttendence(Long id, int days);
 
     // Update existing employee information
-    EmployeeDetailsResponseDto updateEmployee(Long id, AddEmployeeRequestDto updateReq);
+    EmployeeDetailsResponseDto updateEmployee(Long id, UpdateEmployeeRequestDto updateReq);
     
     EmployeeDetailsResponseDto updatePassword(Long id, UpdatePasswordRequestDto updatePasswordRequestDto);
     EmployeeDetailsResponseDto updateBankDetails(Long id, UpdateBankDetailsRequestDto bankDetailsDto);

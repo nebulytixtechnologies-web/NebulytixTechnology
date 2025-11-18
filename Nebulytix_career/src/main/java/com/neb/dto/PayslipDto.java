@@ -30,7 +30,6 @@ public class PayslipDto {
 
     // file info
     private String fileName;
-    // Optional: you may or may not expose pdfPath
     private String pdfPath;
 
     // employee details
@@ -73,7 +72,6 @@ public class PayslipDto {
         dto.setAggrgDeduction(p.getAggrgDeduction());
         dto.setIncHdSalary(p.getIncHdSalary());
         dto.setTaxCredit(p.getTaxCredit());
-
 
         if (p.getEmployee() != null) {
             Employee emp = p.getEmployee();

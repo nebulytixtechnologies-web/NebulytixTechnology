@@ -132,7 +132,6 @@ public class AdminServiceImpl implements AdminService{
             }
             
             try {
-            	
             	// ensure directory exists
                 Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
                 Files.createDirectories(uploadPath);
@@ -184,8 +183,7 @@ public class AdminServiceImpl implements AdminService{
                 .collect(Collectors.toList());
     
     }
-    
-   
+       
     private WorkResponseDto mapToDto(Work work) {
         WorkResponseDto dto = new WorkResponseDto();
         dto.setId(work.getId());
@@ -217,43 +215,41 @@ public class AdminServiceImpl implements AdminService{
 		}
 	}
 
-	@Override
-	public UpdateEmployeeResponseDto updateHrDetails(Long empId, UpdateEmployeeRequestDto updateReq) {
-		
-		Employee hr = empRepo.findById(empId).orElseThrow(()->new CustomeException("hr not found with id :"+empId));
-		hr.setFirstName(updateReq.getFirstName());
-		hr.setLastName(updateReq.getLastName());
-		hr.setEmail(updateReq.getEmail());
-		hr.setMobile(updateReq.getMobile());
-		hr.setCardNumber(updateReq.getCardNumber());
-		hr.setLoginRole(updateReq.getLoginRole());
-		hr.setJobRole(updateReq.getJobRole());
-		hr.setDomain(updateReq.getDomain());
-		hr.setGender(updateReq.getGender());
-		hr.setJoiningDate(updateReq.getJoiningDate());
-		hr.setSalary(updateReq.getSalary());
-		hr.setDaysPresent(updateReq.getDaysPresent());
-		hr.setPaidLeaves(updateReq.getPaidLeaves());
-		hr.setBankAccountNumber(updateReq.getBankAccountNumber());
-		hr.setBankName(updateReq.getBankName());
-		hr.setPfNumber(updateReq.getPfNumber());
-		hr.setPanNumber(updateReq.getPanNumber());
-		hr.setUanNumber(updateReq.getUanNumber());
-		hr.setEpsNumber(updateReq.getEpsNumber());
-		hr.setEsiNumber(updateReq.getEsiNumber());
-		
-		Employee emp = empRepo.save(hr);
-		UpdateEmployeeResponseDto updateHrRes = mapper.map(emp, UpdateEmployeeResponseDto.class);
-		return updateHrRes;
-	}
+//	@Override
+//	public UpdateEmployeeResponseDto updateHrDetails(Long empId, UpdateEmployeeRequestDto updateReq) {
+//		
+//		Employee hr = empRepo.findById(empId).orElseThrow(()->new CustomeException("hr not found with id :"+empId));
+//		hr.setFirstName(updateReq.getFirstName());
+//		hr.setLastName(updateReq.getLastName());
+//		hr.setEmail(updateReq.getEmail());
+//		hr.setMobile(updateReq.getMobile());
+//		hr.setCardNumber(updateReq.getCardNumber());
+//		hr.setLoginRole(updateReq.getLoginRole());
+//		hr.setJobRole(updateReq.getJobRole());
+//		hr.setDomain(updateReq.getDomain());
+//		hr.setGender(updateReq.getGender());
+//		hr.setJoiningDate(updateReq.getJoiningDate());
+//		hr.setSalary(updateReq.getSalary());
+//		hr.setDaysPresent(updateReq.getDaysPresent());
+//		hr.setPaidLeaves(updateReq.getPaidLeaves());
+//		hr.setBankAccountNumber(updateReq.getBankAccountNumber());
+//		hr.setBankName(updateReq.getBankName());
+//		hr.setPfNumber(updateReq.getPfNumber());
+//		hr.setPanNumber(updateReq.getPanNumber());
+//		hr.setUanNumber(updateReq.getUanNumber());
+//		hr.setEpsNumber(updateReq.getEpsNumber());
+//		hr.setEsiNumber(updateReq.getEsiNumber());
+//		
+//		Employee emp = empRepo.save(hr);
+//		UpdateEmployeeResponseDto updateHrRes = mapper.map(emp, UpdateEmployeeResponseDto.class);
+//		return updateHrRes;
+//	}
 	@Override
 	public EmployeeDetailsResponseDto getEmployee(Long id) {
 
-		Employee emp = empRepo.findById(id).orElseThrow(()->new CustomeException("Employee not founce wuith id :"+id));
-		return mapper.map(emp, EmployeeDetailsResponseDto.class);
-		
+		Employee emp = empRepo.findById(id).orElseThrow(()->new CustomeException("Employee not found wuith id :"+id));
+		return mapper.map(emp, EmployeeDetailsResponseDto.class);	
 	}
-
 	@Override
 	public byte[] generateDailyReport(LocalDate date) throws Exception {
 	    List<Work> works = workRepo.findBySubmittedDate(date);
@@ -263,7 +259,6 @@ public class AdminServiceImpl implements AdminService{
 	    ReportGeneratorPdf pdfGenerator = new ReportGeneratorPdf();
 	    byte[] dailyReportPDF = pdfGenerator.generateDailyReportPDF(works, date);
 	    return dailyReportPDF;
-
 	}
 	
 	}

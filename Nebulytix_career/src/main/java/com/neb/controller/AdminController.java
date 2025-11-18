@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,17 +40,7 @@ import com.neb.service.AdminService;
 import com.neb.service.EmployeeService;
 import com.neb.service.HrService;
 
-/**
- * AdminController handles all administrative operations for the AdminHrEmpDashBoards system.
- * 
- * This includes:
- *  -- Admin login
- *  -- HR employee management
- *  -- Work assignment and tracking
- *  -- Admin add HR Detail
- * 
- * All endpoints are CORS-enabled for access from the frontend at http://localhost:5173.
- */
+
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -65,12 +54,6 @@ public class AdminController {
 	@Autowired
 	private EmployeeService employeeService;
 	
-	 /**
-     * Handles admin login requests.
-     * 
-     * @param loginReq Contains admin login credentials (email and password).
-     * @return Response with admin details and login success message.
-     */
 	@PostMapping("/login")
 	public ResponseEntity<ResponseMessage<EmployeeResponseDto>> login(@RequestBody LoginRequestDto loginReq){
 		
@@ -107,12 +90,6 @@ public class AdminController {
 		
 		return ResponseEntity.ok(new ResponseMessage<List<EmployeeDetailsResponseDto>>(HttpStatus.OK.value(), HttpStatus.OK.name(), "All Employee fetched successfully", employeeList));
 	}
-	     /**
-	     * Assigns work to an employee.
-	     * 
-	     * @param req Work assignment request containing employee ID and task details.
-	     * @return Response confirming work assignment success.
-	     */
 	 @PostMapping(value = "/work/add", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
 	 
 	    public ResponseEntity<ResponseMessage<String>> addWork(
@@ -139,13 +116,8 @@ public class AdminController {
 	        return ResponseEntity.ok(new ResponseMessage<>(200, "OK", "All work fetched successfully", works));
 	    }
 	    
-	    /**
-	     * Retrieves all work assigned to a specific employee.
-	     * 
-	     * @param empId The ID of the employee whose work is to be fetched.
-	     * @return Response containing a list of work assigned to the employee.
-	     */
-	    // ✅ Get Employee Work
+	    
+	    //  Get Employee Work
 	    @GetMapping("/getWork/{empId}")
 	    public ResponseEntity<ResponseMessage<List<WorkResponseDto>>> getWorkByEmployee(@PathVariable Long empId) {
 	        List<WorkResponseDto> works = adminService.getWorkByEmployee(empId);
@@ -158,13 +130,13 @@ public class AdminController {
 	    	return ResponseEntity.ok(new ResponseMessage<>(200, "OK", "hr deleted successfully", deleteRes));
 	    }
 	    
-	    @PutMapping("/update/hr/{id}")//http://localhost:5054/api/admin/update/hr/4
-		public ResponseEntity<ResponseMessage<UpdateEmployeeResponseDto>> updateHr(@PathVariable Long id,@RequestBody UpdateEmployeeRequestDto updateReq){
-			
-			UpdateEmployeeResponseDto updatedhrRes = adminService.updateHrDetails(id, updateReq);
-			
-			return ResponseEntity.ok(new ResponseMessage<UpdateEmployeeResponseDto>(HttpStatus.OK.value(), HttpStatus.OK.name(), "hr details updated successfully", updatedhrRes));
-		}
+//	    @PutMapping("/update/hr/{id}")//http://localhost:5054/api/admin/update/hr/4
+//		public ResponseEntity<ResponseMessage<UpdateEmployeeResponseDto>> updateHr(@PathVariable Long id,@RequestBody UpdateEmployeeRequestDto updateReq){
+//			
+//			UpdateEmployeeResponseDto updatedhrRes = adminService.updateHrDetails(id, updateReq);
+//			
+//			return ResponseEntity.ok(new ResponseMessage<UpdateEmployeeResponseDto>(HttpStatus.OK.value(), HttpStatus.OK.name(), "hr details updated successfully", updatedhrRes));
+//		}
 	    
 	    @GetMapping("/getEmp/{id}")
 		public ResponseEntity<ResponseMessage<EmployeeDetailsResponseDto>> getEmployee(@PathVariable Long id){
@@ -174,13 +146,7 @@ public class AdminController {
 			
 			return ResponseEntity.ok(new ResponseMessage<EmployeeDetailsResponseDto>(HttpStatus.OK.value(), HttpStatus.OK.name(), " Employee fetched successfully", employee));
 		}
-		 /**
-	     * Downloads an employee's payslip as a PDF file.
-	     *
-	     * @param id the ID of the payslip
-	     * @return a PDF file containing the payslip
-	     * @throws Exception if the payslip cannot be generated or retrieved
-	     */
+		
 		@GetMapping("/payslip/{id}/download")
 	    public ResponseEntity<byte[]> download(@PathVariable Long id) throws Exception {
 	        byte[] pdf = hrService.downloadPayslip(id);
@@ -239,18 +205,17 @@ public class AdminController {
 	    }
 	    
 	    @GetMapping("/reports/daily")
-	    public ResponseEntity<byte[]> generateReport(@RequestParam LocalDate submittedDate) throws Exception {
-	    	
-	        byte[] pdfBytes = adminService.generateDailyReport(submittedDate);
+	    public ResponseEntity<byte[]> generateReport() throws Exception {
+	    		    	
+	    	LocalDate date = LocalDate.of(2025, 11, 05);
+	        byte[] pdfBytes = adminService.generateDailyReport(date);
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.setContentType(MediaType.APPLICATION_PDF);
 	        headers.setContentDisposition(ContentDisposition
 	            .attachment()
-	            .filename("DailyReport_" + submittedDate + ".pdf")
+	            .filename("DailyReport_" + date + ".pdf")
 	            .build());
 	        System.out.println("pdf generated");
 	        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
 	    }
-	    
-	 
 }

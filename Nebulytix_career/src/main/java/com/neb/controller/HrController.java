@@ -29,6 +29,7 @@ import com.neb.dto.LoginRequestDto;
 import com.neb.dto.PayslipDto;
 import com.neb.dto.ResponseMessage;
 import com.neb.dto.UpdateBankDetailsRequestDto;
+import com.neb.dto.UpdateEmployeeRequestDto;
 import com.neb.dto.UpdatePasswordRequestDto;
 import com.neb.entity.Payslip;
 import com.neb.service.EmployeeService;
@@ -207,7 +208,7 @@ public class HrController {
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponseMessage<EmployeeDetailsResponseDto>> updateEmployee(
             @PathVariable Long id,
-            @RequestBody AddEmployeeRequestDto updateReq) {
+            @RequestBody UpdateEmployeeRequestDto updateReq) {
 
         EmployeeDetailsResponseDto updatedEmp = service.updateEmployee(id, updateReq);
         return ResponseEntity.ok(new ResponseMessage<>(

@@ -1,5 +1,7 @@
 package com.neb.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.neb.dto.AddJobApplicationRequestDto;
 import com.neb.dto.AddJobApplicationResponseDto;
+import com.neb.dto.JobApplicationDto;
 import com.neb.dto.JobDetailsDto;
 import com.neb.dto.ResponseMessage;
 import com.neb.service.CareerPageService;
@@ -27,9 +30,6 @@ public class CareerPageController {
     @Autowired
     private CareerPageService service;
 
-    /**
-     * ✅ Get job details by ID
-     */
     @GetMapping("/job/{id}")
     public ResponseEntity<ResponseMessage<JobDetailsDto>> getJobById(@PathVariable("id") Long id) {
         JobDetailsDto job = service.getJobById(id);
@@ -63,5 +63,19 @@ public class CareerPageController {
                         resp));
     }
     
-    
+    @GetMapping("/job/{jobId}/applications")
+    public ResponseEntity<ResponseMessage<List<JobApplicationDto>>> getApplicationsByJob(
+            @PathVariable Long jobId) {
+
+        List<JobApplicationDto> applications = service.getApplicationsByJobId(jobId);
+
+        return ResponseEntity.ok(
+                new ResponseMessage<>(
+                        HttpStatus.OK.value(),
+                        HttpStatus.OK.name(),
+                        "Applications fetched successfully",
+                        applications
+                )
+        );
+    }  
 }

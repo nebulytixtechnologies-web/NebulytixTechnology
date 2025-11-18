@@ -34,7 +34,7 @@ public interface AdminService {
     
     public String deleteHr(Long id);
     
-    public UpdateEmployeeResponseDto updateHrDetails(Long empId,UpdateEmployeeRequestDto updateReq);
+   // public UpdateEmployeeResponseDto updateHrDetails(Long empId,UpdateEmployeeRequestDto updateReq);
     
     public byte[] generateDailyReport(LocalDate date)throws Exception;
 }

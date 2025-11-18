@@ -30,33 +30,6 @@ import com.neb.entity.Payslip;
 import com.neb.entity.Work;
 import com.neb.service.EmployeeService;
 
-/**
- * =====================================================
- *                   EmployeeController
- * =====================================================
- * 
- * 
- * This REST controller manages all endpoints related to 
- * employee operations in the NEB HR Management System.
- * 
- * 
- * Responsibilities:
- *    -- Handle employee authentication
- *    -- Provide employee details and assigned work
- *    -- Generate monthly payslips
- *    -- Allow employees to submit work reports
- * 
- * 
- *
- * This controller acts as an interface between the front-end 
- * (React/Vue/Angular) and the service layer {@link EmployeeService}.
- * 
- * 
- * 
- * CORS is enabled for requests originating from 
- *  http://localhost:5173, which is typically your frontend development server.
- * 
- */
 @RestController
 @RequestMapping("/api/employee")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -65,12 +38,6 @@ public class EmployeeController {
 	@Autowired
 	private EmployeeService employeeService;
 	
-	 /**
-     * Handles employee login requests.
-     *
-     * @param loginReq DTO containing login credentials (email and password)
-     * @return A ResponseEntity with login success message and employee details
-     */
 	@PostMapping("/login")
 	public ResponseEntity<ResponseMessage<EmployeeResponseDto>> login(@RequestBody LoginRequestDto loginReq){
 		
@@ -79,13 +46,6 @@ public class EmployeeController {
 		return ResponseEntity.ok(new ResponseMessage<EmployeeResponseDto>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Employee login successfully", loginRes));
 	}
 	
-	/**
-     * Generates a payslip for an employee for a specific month and year.
-     *
-     * @param request DTO containing employee ID and month-year for which payslip is to be generated
-     * @return A ResponseEntity with the generated PayslipDto
-     * @throws Exception If payslip generation fails or employee not found
-     */
 	@PostMapping("/payslip/generate")
     public ResponseEntity<PayslipDto> generate(@RequestBody GeneratePayslipRequest request) throws Exception {
         System.out.println(request);
@@ -94,12 +54,6 @@ public class EmployeeController {
         return ResponseEntity.ok(dto);
     }
 	
-	 /**
-     * Fetches employee details by their ID.
-     *
-     * @param id The unique ID of the employee
-     * @return A ResponseMessage containing employee entity details
-     */
 	 // Get employee details
     @GetMapping("/get/{id}")
     public ResponseMessage<Employee> getEmployee(@PathVariable Long id) {
@@ -107,12 +61,6 @@ public class EmployeeController {
         return new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Employee fetched successfully", emp);
     }
     
-    /**
-     * Fetches employee details by their email address.
-     *
-     * @param email Employee’s email address
-     * @return A ResponseEntity with employee details or NOT_FOUND if no employee exists with the given email
-     */
     @GetMapping("/details/{email}")
     public ResponseEntity<ResponseMessage<EmployeeDetailsResponseDto>> getEmployeeByEmail(@PathVariable String email) {
     	EmployeeDetailsResponseDto emp = employeeService.getEmployeeByEmail(email);	
@@ -125,12 +73,6 @@ public class EmployeeController {
         );
     }
     
-    /**
-     * Retrieves the list of tasks assigned to a specific employee.
-     *
-     * @param employeeId The ID of the employee
-     * @return A ResponseMessage containing the list of Work objects assigned to the employee
-     */
     // Get tasks assigned to employee
     @GetMapping("/tasks/{employeeId}")
     public ResponseMessage<List<Work>> getTasks(@PathVariable Long employeeId) {
@@ -138,14 +80,6 @@ public class EmployeeController {
         return new ResponseMessage<>(HttpStatus.OK.value(), HttpStatus.OK.name(), "Tasks fetched successfully", tasks);
     }
     
-    /**
-     * Submits a report for a specific assigned task.
-     *
-     * @param taskId The ID of the task being reported
-     * @param reportData Work object containing report details submitted by the employee
-     * @return A ResponseMessage containing updated Work information after report submission
-     */
-   
    // Submit task report
     @PutMapping("/task/submit/{taskId}")
     public ResponseEntity<ResponseMessage<WorkResponseDto>> submitTaskReport(
